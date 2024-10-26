@@ -1,4 +1,4 @@
-#include "ClassDeclarations.h"
+#include "Knight.h"
 
 Knight::Knight(TeamColors color) : ChessPiece(color){};
 Knight::~Knight(){};

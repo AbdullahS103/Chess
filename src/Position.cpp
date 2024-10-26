@@ -1,4 +1,4 @@
-#include "ClassDeclarations.h"
+#include "Position.h"
 
 // Constructor for Position
 Position::Position(int row, int col) {

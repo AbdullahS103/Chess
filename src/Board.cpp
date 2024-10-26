@@ -1,4 +1,6 @@
-#include "ClassDeclarations.h"
+#include "Board.h"
+#include "ChessPiece.h"
+#include "Knight.h"
 #include "Errors.h"
 
 // Standard board

@@ -1,4 +1,4 @@
-#include "ClassDeclarations.h"
+#include "ChessPiece.h"
 #include "Errors.h"
 
 // Constructor for ChessPiece

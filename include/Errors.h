@@ -1,5 +1,7 @@
-#include <iostream>
-using namespace std;
+#ifndef ERRORS_H
+#define ERRORS_H
+
+#include "CommonHeaders.h"
 
 class UnsupportedFunctionException : public std::runtime_error {
 public:
@@ -15,3 +17,5 @@ class InvalidIndexException : public std::runtime_error {
 public:
   InvalidIndexException(const std::string &message): std::runtime_error(message) {}
 };
+
+#endif
