@@ -1,5 +1,4 @@
 #include "Board.h"
-#include "ChessPiece.h"
 #include "Knight.h"
 #include "Errors.h"
 
