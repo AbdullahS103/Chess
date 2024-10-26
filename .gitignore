@@ -2,5 +2,7 @@
 *.o
 
 # Executables
+chess
+chess-debug
 *.exe
 *.out
