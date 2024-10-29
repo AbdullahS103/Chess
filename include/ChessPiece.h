@@ -22,6 +22,8 @@ public:
   virtual string getIdentifier() const;
 
   bool isSameTeam(TeamColors color);
+  bool isSameTeam(ChessPiece *piece);
+  
   // Print the the identifier of a chess piece
   friend ostream &operator<<(ostream &strm, const ChessPiece &chessPiece);
 };

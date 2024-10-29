@@ -29,3 +29,9 @@ string ChessPiece::getIdentifier() const {
 bool ChessPiece::isSameTeam(TeamColors color) {
   return this->color == color;
 }
+
+bool ChessPiece::isSameTeam(ChessPiece *piece) {
+  if (piece == nullptr)
+    return false;
+  return this->color == piece->color;
+}

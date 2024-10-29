@@ -1,5 +1,6 @@
 #include "Board.h"
 #include "Knight.h"
+#include "Bishop.h"
 #include "Errors.h"
 
 // Standard board
@@ -10,6 +11,7 @@ Board::Board() {
   this->board = new ChessPiece *[this->boardSize];
 
   this->board[0] = new Knight(TeamColors::WHITE);
+  this->board[10] = new Bishop(TeamColors::WHITE);
 };
 
 // Board with custom board size
@@ -71,19 +73,23 @@ void Board::setPiece(int row, int col, ChessPiece *piece) {
 }
 
 void Board::movePiece(int fromRow, int fromCol, int toRow, int toCol) {
-  ChessPiece *piece = this->getPiece(fromRow, fromCol);
-  if (piece == nullptr)
+  ChessPiece *fromPiece = this->getPiece(fromRow, fromCol);
+  if (fromPiece == nullptr)
     throw std::invalid_argument("No piece at from position");
 
   // validate the move
   int fromIndex = this->getIndex(fromRow, fromCol);
   int toIndex = this->getIndex(toRow, toCol);
-  if (!piece->isValidMove(*this, fromRow, fromCol, toRow, toCol))
+  if (!fromPiece->isValidMove(*this, fromRow, fromCol, toRow, toCol))
     throw InvalidMoveException("Invalid move");
+
+  ChessPiece *toPiece = this->getPiece(toRow, toCol);
+  if (fromPiece->isSameTeam(toPiece))
+    throw std::invalid_argument("Move intersects with another piece from the same team!");
 
   // move the piece
   delete this->board[toIndex];
-  this->board[toIndex] = piece;
+  this->board[toIndex] = fromPiece;
   this->board[fromIndex] = nullptr;
 }
 
