@@ -11,12 +11,12 @@ ostream &operator<<(ostream &strm, const ChessPiece &chessPiece) {
   return strm << chessPiece.getIdentifier() << endl;
 };
 
-bool ChessPiece::isValidMove(Board &board, int fromIndex, int toIndex) {
+bool ChessPiece::isValidMove(Board &board, int fromRow, int fromCol, int toRow, int toCol) {
   throw UnsupportedFunctionException(
     "Class ChessPiece does not support isValidMove");
 };
 
-unordered_set<int> ChessPiece::getAllValidMoves(Board &board, int index) {
+unordered_set<int> ChessPiece::getAllValidMoves(Board &board, int row, int col) {
   throw UnsupportedFunctionException(
     "Class ChessPiece does not support getAllValidMoves");
 }
@@ -24,4 +24,8 @@ unordered_set<int> ChessPiece::getAllValidMoves(Board &board, int index) {
 string ChessPiece::getIdentifier() const {
   throw UnsupportedFunctionException(
     "Class ChessPiece does not support getIdentifier");
+}
+
+bool ChessPiece::isSameTeam(TeamColors color) {
+  return this->color == color;
 }

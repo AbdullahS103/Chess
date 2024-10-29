@@ -12,7 +12,7 @@ class Board {
   int cols;
   int boardSize;
 
-  string getBoardString() const;
+  string toString() const;
 
 public:
   Board();

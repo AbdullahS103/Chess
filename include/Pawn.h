@@ -8,8 +8,8 @@ public:
   Pawn(TeamColors color);
   ~Pawn();
 
-  bool isValidMove(Board &board, int fromIndex, int toIndex);
-  unordered_set<int> getAllValidMoves(Board &board, int index);
+  bool isValidMove(Board &board, int fromRow, int fromCol, int toRow, int toCol);
+  unordered_set<int> getAllValidMoves(Board &board, int row, int col);
   string getIdentifier() const;
 };
 

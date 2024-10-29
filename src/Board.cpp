@@ -28,6 +28,7 @@ Board::~Board() {
 
 int Board::getCol(int index) { return index % this->cols; };
 int Board::getRow(int index) { return index / this->cols; };
+
 bool Board::isOnBoard(int row, int col) {
   return row >= 0 && row < this->rows && col >= 0 && col < this->cols;
 }
@@ -42,10 +43,10 @@ const int Board::getIndex(int row, int col) {
 };
 
 ostream &operator<<(ostream &strm, const Board &board) {
-  return strm << board.getBoardString();
+  return strm << board.toString();
 };
 
-string Board::getBoardString() const {
+string Board::toString() const {
   string boardString = "";
   for (int i = 0; i < this->boardSize; i++) {
     if (this->board[i] == nullptr)
@@ -59,6 +60,8 @@ string Board::getBoardString() const {
 }
 
 ChessPiece *Board::getPiece(int row, int col) {
+  if (!isOnBoard(row, col))
+    throw InvalidIndexException("Invalid row " + to_string(row) + " and column " + to_string(col));
   return this->board[this->getIndex(row, col)];
 }
 
@@ -75,7 +78,7 @@ void Board::movePiece(int fromRow, int fromCol, int toRow, int toCol) {
   // validate the move
   int fromIndex = this->getIndex(fromRow, fromCol);
   int toIndex = this->getIndex(toRow, toCol);
-  if (!piece->isValidMove(*this, fromIndex, toIndex))
+  if (!piece->isValidMove(*this, fromRow, fromCol, toRow, toCol))
     throw InvalidMoveException("Invalid move");
 
   // move the piece
