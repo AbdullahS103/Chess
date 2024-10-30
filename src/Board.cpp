@@ -2,6 +2,7 @@
 #include "Knight.h"
 #include "Bishop.h"
 #include "King.h"
+#include "Rook.h"
 #include "Errors.h"
 
 // Standard board
@@ -11,6 +12,7 @@ Board::Board() {
   this->cols = 8;
   this->board = new ChessPiece *[this->boardSize];
 
+  this->board[0] = new Rook(TeamColors::WHITE);
   this->board[1] = new Knight(TeamColors::WHITE);
   this->board[4] = new King(TeamColors::WHITE);
   this->board[2] = new Bishop(TeamColors::WHITE);
