@@ -30,8 +30,14 @@ unordered_set<int> Bishop::getAllValidMoves(Board &board, int row, int col) {
         break;
       
       ChessPiece *currentPiece = board.getPiece(newRow, newCol);
-      if (currentPiece == nullptr || currentPiece->isSameTeam(this->color))
+      if (currentPiece == nullptr) {
         validMoves.insert(board.getIndex(newRow, newCol));
+      } else if (!currentPiece->isSameTeam(this->color)) {
+        validMoves.insert(board.getIndex(newRow, newCol));
+        break;
+      } else {
+        break;
+      }
     }
   }
   return validMoves;
