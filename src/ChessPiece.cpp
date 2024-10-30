@@ -2,13 +2,15 @@
 #include "Errors.h"
 
 // Constructor for ChessPiece
-ChessPiece::ChessPiece(TeamColors color) { this->color = color; }
+ChessPiece::ChessPiece(TeamColors color) { 
+  this->color = color; 
+}
 
 // Destructor for ChessPiece, its a formality but it is good practice
 ChessPiece::~ChessPiece(){};
 
 ostream &operator<<(ostream &strm, const ChessPiece &chessPiece) {
-  return strm << chessPiece.getIdentifier() << endl;
+  return strm << chessPiece.getSymbol() << endl;
 };
 
 bool ChessPiece::isValidMove(Board &board, int fromRow, int fromCol, int toRow, int toCol) {
@@ -21,9 +23,9 @@ unordered_set<int> ChessPiece::getAllValidMoves(Board &board, int row, int col) 
     "Class ChessPiece does not support getAllValidMoves");
 }
 
-string ChessPiece::getIdentifier() const {
+string ChessPiece::getSymbol() const {
   throw UnsupportedFunctionException(
-    "Class ChessPiece does not support getIdentifier");
+    "Class ChessPiece does not support getSymbol");
 }
 
 bool ChessPiece::isSameTeam(TeamColors color) {

@@ -1,9 +1,14 @@
 #include "Bishop.h"
 
-Bishop::Bishop(TeamColors color) : ChessPiece(color){};
+Bishop::Bishop(TeamColors color) : ChessPiece(color){
+  if (color == TeamColors::WHITE)
+    this->symbol = "♗";
+  else 
+    this->symbol = "♝";
+};
 Bishop::~Bishop(){};
 
-string Bishop::getIdentifier() const { return "B"; }
+string Bishop::getSymbol() const { return this->symbol; }
 
 bool Bishop::isValidMove(Board &board, int fromRow, int fromCol, int toRow, int toCol) { 
   int rowDiff = abs(fromRow - toRow);

@@ -1,9 +1,14 @@
 #include "Knight.h"
 
-Knight::Knight(TeamColors color) : ChessPiece(color){};
+Knight::Knight(TeamColors color) : ChessPiece(color){
+  if (color == TeamColors::WHITE)
+    this->symbol = "♘";
+  else 
+    this->symbol = "♞";
+};
 Knight::~Knight(){};
 
-string Knight::getIdentifier() const { return "K"; }
+string Knight::getSymbol() const { return this->symbol; }
 
 bool Knight::isValidMove(Board &board, int fromRow, int fromCol, int toRow, int toCol) { 
   int rowDiff = abs(fromRow - toRow);

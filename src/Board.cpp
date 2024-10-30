@@ -1,6 +1,7 @@
 #include "Board.h"
 #include "Knight.h"
 #include "Bishop.h"
+#include "King.h"
 #include "Errors.h"
 
 // Standard board
@@ -10,8 +11,9 @@ Board::Board() {
   this->cols = 8;
   this->board = new ChessPiece *[this->boardSize];
 
-  this->board[0] = new Knight(TeamColors::WHITE);
-  this->board[10] = new Bishop(TeamColors::WHITE);
+  this->board[1] = new Knight(TeamColors::WHITE);
+  this->board[4] = new King(TeamColors::WHITE);
+  this->board[2] = new Bishop(TeamColors::WHITE);
 };
 
 // Board with custom board size
@@ -54,7 +56,7 @@ string Board::toString() const {
     if (this->board[i] == nullptr)
       boardString += " .  ";
     else
-      boardString += " " + this->board[i]->getIdentifier() + "  ";
+      boardString += " " + this->board[i]->getSymbol() + "  ";
     if (i % this->rows == this->rows - 1)
       boardString += "\n\n";
   }

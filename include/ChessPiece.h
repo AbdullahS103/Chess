@@ -9,6 +9,7 @@
 class ChessPiece {
 protected:
   TeamColors color;
+  string symbol;
 
 public:
   ChessPiece(TeamColors color);
@@ -19,7 +20,7 @@ public:
   // Given the board state and the location, return all valid moves for a given piece
   virtual unordered_set<int> getAllValidMoves(Board &board, int row, int col);
   // Return a unique character associated with piece (mainly for debugging :0)
-  virtual string getIdentifier() const;
+  virtual string getSymbol() const;
 
   bool isSameTeam(TeamColors color);
   bool isSameTeam(ChessPiece *piece);
