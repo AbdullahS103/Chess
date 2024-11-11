@@ -3,6 +3,7 @@
 #include "Bishop.h"
 #include "King.h"
 #include "Rook.h"
+#include "Queen.h"
 #include "Errors.h"
 
 // Standard board
@@ -14,8 +15,21 @@ Board::Board() {
 
   this->board[0] = new Rook(TeamColors::WHITE);
   this->board[1] = new Knight(TeamColors::WHITE);
-  this->board[4] = new King(TeamColors::WHITE);
   this->board[2] = new Bishop(TeamColors::WHITE);
+  this->board[3] = new Queen(TeamColors::WHITE);
+  this->board[4] = new King(TeamColors::WHITE);
+  this->board[5] = new Bishop(TeamColors::WHITE);
+  this->board[6] = new Knight(TeamColors::WHITE);
+  this->board[7] = new Rook(TeamColors::WHITE);
+
+  this->board[56] = new Rook(TeamColors::BLACK);
+  this->board[57] = new Knight(TeamColors::BLACK);
+  this->board[58] = new Bishop(TeamColors::BLACK);
+  this->board[59] = new King(TeamColors::BLACK);
+  this->board[60] = new Queen(TeamColors::BLACK);
+  this->board[61] = new Bishop(TeamColors::BLACK);
+  this->board[62] = new Knight(TeamColors::BLACK);
+  this->board[63] = new Rook(TeamColors::BLACK);
 };
 
 // Board with custom board size
