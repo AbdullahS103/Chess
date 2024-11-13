@@ -1,42 +1,19 @@
 #include "Board.h"
-#include "Knight.h"
-#include "Bishop.h"
-#include "King.h"
-#include "Rook.h"
-#include "Queen.h"
 #include "Errors.h"
 
 // Standard board
 Board::Board() {
   this->boardSize = 64;
   this->rows = 8;
-  this->cols = 8;
+  this->columns = 8;
   this->board = new ChessPiece *[this->boardSize];
-
-  this->board[0] = new Rook(TeamColors::WHITE);
-  this->board[1] = new Knight(TeamColors::WHITE);
-  this->board[2] = new Bishop(TeamColors::WHITE);
-  this->board[3] = new Queen(TeamColors::WHITE);
-  this->board[4] = new King(TeamColors::WHITE);
-  this->board[5] = new Bishop(TeamColors::WHITE);
-  this->board[6] = new Knight(TeamColors::WHITE);
-  this->board[7] = new Rook(TeamColors::WHITE);
-
-  this->board[56] = new Rook(TeamColors::BLACK);
-  this->board[57] = new Knight(TeamColors::BLACK);
-  this->board[58] = new Bishop(TeamColors::BLACK);
-  this->board[59] = new King(TeamColors::BLACK);
-  this->board[60] = new Queen(TeamColors::BLACK);
-  this->board[61] = new Bishop(TeamColors::BLACK);
-  this->board[62] = new Knight(TeamColors::BLACK);
-  this->board[63] = new Rook(TeamColors::BLACK);
 };
 
 // Board with custom board size
-Board::Board(int rows, int cols) {
-  this->boardSize = rows * cols;
+Board::Board(int rows, int columns) {
+  this->boardSize = rows * columns;
   this->rows = rows;
-  this->cols = cols;
+  this->columns = columns;
   this->board = new ChessPiece *[this->boardSize];
 }
 
@@ -46,19 +23,21 @@ Board::~Board() {
   delete[] this->board;
 };
 
-int Board::getCol(int index) { return index % this->cols; };
-int Board::getRow(int index) { return index / this->cols; };
+int Board::getRows() { return this->rows; };
+int Board::getColumns() { return this->columns; };
+int Board::getRow(int index) { return index / this->columns; };
+int Board::getColumn(int index) { return index % this->columns; };
 
 bool Board::isOnBoard(int row, int col) {
-  return row >= 0 && row < this->rows && col >= 0 && col < this->cols;
+  return row >= 0 && row < this->rows && col >= 0 && col < this->columns;
 }
 
 const int Board::getIndex(int row, int col) { 
   if (row < 0 || row >= this->rows)
     throw InvalidIndexException("Invalid row " + to_string(row));
-  if (col < 0 || col >= this->cols)
+  if (col < 0 || col >= this->columns)
     throw InvalidIndexException("Invalid column " + to_string(col));
-  int index = row * this->cols + col;
+  int index = row * this->columns + col;
   return index; 
 };
 

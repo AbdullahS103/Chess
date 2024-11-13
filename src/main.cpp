@@ -1,7 +1,9 @@
 #include "Board.h"
+#include "BoardStateGenerator.h"
 
 int main() {
   Board board = Board();
+  BoardStateGenerator::standardBoard(board);
   
   cout << "board beginning" << endl;
   cout << board;

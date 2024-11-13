@@ -2,6 +2,7 @@
 #define BOARD_H
 
 #include "CommonHeaders.h"
+#include "ChessPiece.h"
 
 class ChessPiece;
 
@@ -9,7 +10,7 @@ class ChessPiece;
 class Board {
   ChessPiece **board;
   int rows;
-  int cols;
+  int columns;
   int boardSize;
 
   string toString() const;
@@ -20,8 +21,10 @@ public:
   ~Board();
 
   // getters
+  int getRows();
+  int getColumns();
   int getRow(int index);
-  int getCol(int index);
+  int getColumn(int index);
   const int getIndex(int row, int col);
   ChessPiece *getPiece(int row, int col);
 

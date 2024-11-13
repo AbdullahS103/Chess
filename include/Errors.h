@@ -18,4 +18,9 @@ public:
   InvalidIndexException(const std::string &message): std::runtime_error(message) {}
 };
 
+class InvalidBoardException : public std::runtime_error {
+public:
+  InvalidBoardException(const std::string &message): std::runtime_error(message) {}
+};
+
 #endif

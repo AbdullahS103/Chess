@@ -5,6 +5,8 @@
 #include "TeamColors.h"
 #include "Board.h"
 
+class Board;
+
 // ChessPiece is an abstract class that represents a general chess piece
 class ChessPiece {
 protected:
