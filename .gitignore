@@ -6,3 +6,7 @@ chess
 chess-debug
 *.exe
 *.out
+
+# Directories 
+./build
+./lib
