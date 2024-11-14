@@ -8,5 +8,5 @@ chess-debug
 *.out
 
 # Directories 
-./build
-./lib
+build/
+lib/
