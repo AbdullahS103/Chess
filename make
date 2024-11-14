@@ -1,12 +1,12 @@
 #! /bin/bash
 
-# Deploy keyword builds and makes the project
+# build keyword builds and makes the project
 if [ "$1" == "build" ]; then
 	echo "Starting the service..."
 	cmake -S . -B build && cmake --build build
 	cp -f build/chess chess
 
-# Test is like deploy, but also runs unit tests
+# build_and_test is like build, but also runs unit tests
 elif [ "$1" == "build_and_test" ]; then
 	cmake -S . -B build && cmake --build build && GTEST_COLOR=1 ctest --test-dir build --output-on-failure
 	cp -f build/chess chess
