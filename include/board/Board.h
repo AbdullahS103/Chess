@@ -13,7 +13,7 @@ class Board {
   int columns;
   int boardSize;
 
-  string toString() const;
+  std::string toString() const;
 
 public:
   Board();
@@ -39,11 +39,11 @@ public:
 
   bool operator==(const Board &board) const;
   bool operator!=(const Board &board) const;
-  bool operator==(nullptr_t) const;
-  bool operator!=(nullptr_t) const;
-  friend bool operator==(nullptr_t, const Board &board);
-  friend bool operator!=(nullptr_t, const Board &board);
-  friend ostream &operator<<(ostream &strm, const Board &board);
+  bool operator==(std::nullptr_t) const;
+  bool operator!=(std::nullptr_t) const;
+  friend bool operator==(std::nullptr_t, const Board &board);
+  friend bool operator!=(std::nullptr_t, const Board &board);
+  friend std::ostream &operator<<(std::ostream &strm, const Board &board);
 };
 
 #endif

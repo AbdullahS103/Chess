@@ -5,13 +5,13 @@ int main() {
   Board board = Board();
   BoardStateGenerator::standardBoard(board);
   
-  cout << "board beginning" << endl;
-  cout << board;
-  cout << "board ending" << endl;
+  std::cout << "board beginning" << std::endl;
+  std::cout << board;
+  std::cout << "board ending" << std::endl;
 
   board.movePiece(0, 1, 1, 3);
-  cout << "board beginning" << endl;
-  cout << board;
-  cout << "board ending" << endl;
+  std::cout << "board beginning" << std::endl;
+  std::cout << board;
+  std::cout << "board ending" << std::endl;
   return 0;
 }

@@ -8,7 +8,7 @@ Queen::Queen(TeamColors color) : ChessPiece(color){
 };
 Queen::~Queen(){};
 
-string Queen::getSymbol() const { return this->symbol; }
+std::string Queen::getSymbol() const { return this->symbol; }
 
 bool Queen::isValidMove(Board &board, int fromRow, int fromCol, int toRow, int toCol) { 
   int rowDiff = abs(fromRow - toRow);
@@ -16,7 +16,7 @@ bool Queen::isValidMove(Board &board, int fromRow, int fromCol, int toRow, int t
   return (rowDiff == 0 || colDiff == 0) || (rowDiff == colDiff && rowDiff != 0);
 };
 
-unordered_set<int> Queen::getAllValidMoves(Board &board, int row, int col) {
+std::unordered_set<int> Queen::getAllValidMoves(Board &board, int row, int col) {
   std::unordered_set<int> validMoves;
   int rowOffset[] = {1, -1, 0, 0, 1, 1, -1, -1};
   int colOffset[] = {0, 0, 1, -1, 1, -1, 1, -1};

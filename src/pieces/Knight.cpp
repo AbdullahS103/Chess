@@ -8,7 +8,7 @@ Knight::Knight(TeamColors color) : ChessPiece(color){
 };
 Knight::~Knight(){};
 
-string Knight::getSymbol() const { return this->symbol; }
+std::string Knight::getSymbol() const { return this->symbol; }
 
 bool Knight::isValidMove(Board &board, int fromRow, int fromCol, int toRow, int toCol) { 
   int rowDiff = abs(fromRow - toRow);
@@ -20,7 +20,7 @@ bool Knight::isValidMove(Board &board, int fromRow, int fromCol, int toRow, int 
   return false;
 };
 
-unordered_set<int> Knight::getAllValidMoves(Board &board, int row, int col) {
+std::unordered_set<int> Knight::getAllValidMoves(Board &board, int row, int col) {
   std::unordered_set<int> validMoves;
   int rowOffset[] = {2, 1, -1, -2, -2, -1, 1, 2};
   int colOffset[] = {1, 2, 2, 1, -1, -2, -2, -1};

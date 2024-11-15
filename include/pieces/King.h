@@ -9,8 +9,8 @@ public:
   ~King();
 
   bool isValidMove(Board &board, int fromRow, int fromCol, int toRow, int toCol);
-  unordered_set<int> getAllValidMoves(Board &board, int row, int col);
-  string getSymbol() const;
+  std::unordered_set<int> getAllValidMoves(Board &board, int row, int col);
+  std::string getSymbol() const;
 
   bool operator==(const ChessPiece &piece) const;
   bool operator!=(const ChessPiece &piece) const;

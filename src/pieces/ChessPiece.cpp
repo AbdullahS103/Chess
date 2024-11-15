@@ -9,17 +9,17 @@ ChessPiece::ChessPiece(TeamColors color) {
 // Destructor for ChessPiece, its a formality but it is good practice
 ChessPiece::~ChessPiece(){};
 
-ostream &operator<<(ostream &strm, const ChessPiece &piece) { return strm << piece.getSymbol() << endl; };
+std::ostream &operator<<(std::ostream &strm, const ChessPiece &piece) { return strm << piece.getSymbol() << std::endl; };
 
 bool ChessPiece::isValidMove(Board &board, int fromRow, int fromCol, int toRow, int toCol) {
   throw UnsupportedFunctionException("Class ChessPiece does not support isValidMove");
 };
 
-unordered_set<int> ChessPiece::getAllValidMoves(Board &board, int row, int col) {
+std::unordered_set<int> ChessPiece::getAllValidMoves(Board &board, int row, int col) {
   throw UnsupportedFunctionException( "Class ChessPiece does not support getAllValidMoves");
 }
 
-string ChessPiece::getSymbol() const {
+std::string ChessPiece::getSymbol() const {
   throw UnsupportedFunctionException("Class ChessPiece does not support getSymbol");
 }
 
@@ -35,7 +35,7 @@ bool ChessPiece::operator==(const ChessPiece &piece) const {
   throw UnsupportedFunctionException("Class ChessPiece does not support == operation");
 }
 bool ChessPiece::operator!=(const ChessPiece &piece) const { return !(*this == piece); };
-bool ChessPiece::operator==(nullptr_t) const { return false; };
-bool ChessPiece::operator!=(nullptr_t) const { return true; };
-bool operator==(nullptr_t, const ChessPiece &piece) { return false; };
-bool operator!=(nullptr_t, const ChessPiece &piece) { return true; };
+bool ChessPiece::operator==(std::nullptr_t) const { return false; };
+bool ChessPiece::operator!=(std::nullptr_t) const { return true; };
+bool operator==(std::nullptr_t, const ChessPiece &piece) { return false; };
+bool operator!=(std::nullptr_t, const ChessPiece &piece) { return true; };

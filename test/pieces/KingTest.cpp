@@ -104,8 +104,8 @@ TEST(KingTests, AllValidMovesTest1) {
   testBoard.setPiece(5, 6, new King(TeamColors::WHITE));
   testBoard.setPiece(4, 4, new King(TeamColors::BLACK));
 
-  unordered_set<int> moves = testBoard.getPiece(5, 5)->getAllValidMoves(testBoard, 5, 5);
-  unordered_set<int> answer;
+  std::unordered_set<int> moves = testBoard.getPiece(5, 5)->getAllValidMoves(testBoard, 5, 5);
+  std::unordered_set<int> answer;
   answer.insert(testBoard.getIndex(6, 4));
   answer.insert(testBoard.getIndex(6, 5));
   answer.insert(testBoard.getIndex(6, 6));
@@ -122,8 +122,8 @@ TEST(KingTests, AllValidMovesTest2) {
   Board testBoard = Board();
   testBoard.setPiece(0, 0, new King(TeamColors::WHITE));
 
-  unordered_set<int> moves = testBoard.getPiece(0, 0)->getAllValidMoves(testBoard, 0, 0);
-  unordered_set<int> answer;
+  std::unordered_set<int> moves = testBoard.getPiece(0, 0)->getAllValidMoves(testBoard, 0, 0);
+  std::unordered_set<int> answer;
   answer.insert(testBoard.getIndex(1, 0));
   answer.insert(testBoard.getIndex(0, 1));
   answer.insert(testBoard.getIndex(1, 1));

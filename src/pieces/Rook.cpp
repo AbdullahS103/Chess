@@ -8,7 +8,7 @@ Rook::Rook(TeamColors color) : ChessPiece(color){
 };
 Rook::~Rook(){};
 
-string Rook::getSymbol() const { return this->symbol; }
+std::string Rook::getSymbol() const { return this->symbol; }
 
 bool Rook::isValidMove(Board &board, int fromRow, int fromCol, int toRow, int toCol) { 
   int rowDiff = abs(fromRow - toRow);
@@ -16,7 +16,7 @@ bool Rook::isValidMove(Board &board, int fromRow, int fromCol, int toRow, int to
   return rowDiff == 0 || colDiff == 0;
 };
 
-unordered_set<int> Rook::getAllValidMoves(Board &board, int row, int col) {
+std::unordered_set<int> Rook::getAllValidMoves(Board &board, int row, int col) {
   std::unordered_set<int> validMoves;
   int rowOffset[] = {1, -1, 0, 0};
   int colOffset[] = {0, 0, 1, -1};

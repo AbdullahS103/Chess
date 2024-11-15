@@ -8,7 +8,7 @@ Bishop::Bishop(TeamColors color) : ChessPiece(color){
 };
 Bishop::~Bishop(){};
 
-string Bishop::getSymbol() const { return this->symbol; }
+std::string Bishop::getSymbol() const { return this->symbol; }
 
 bool Bishop::isValidMove(Board &board, int fromRow, int fromCol, int toRow, int toCol) { 
   int rowDiff = abs(fromRow - toRow);
@@ -16,7 +16,7 @@ bool Bishop::isValidMove(Board &board, int fromRow, int fromCol, int toRow, int 
   return rowDiff == colDiff && rowDiff != 0;
 };
 
-unordered_set<int> Bishop::getAllValidMoves(Board &board, int row, int col) {
+std::unordered_set<int> Bishop::getAllValidMoves(Board &board, int row, int col) {
   std::unordered_set<int> validMoves;
   int rowOffset[] = {1, 1, -1, -1};
   int colOffset[] = {1, -1, 1, -1};

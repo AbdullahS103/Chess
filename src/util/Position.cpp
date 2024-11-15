@@ -8,7 +8,7 @@ Position::Position(int row, int col) {
 Position::~Position(){};
 
 // Overloaded << operator for Position to display current position
-ostream &operator<<(ostream &strm, const Position &position) {
+std::ostream &operator<<(std::ostream &strm, const Position &position) {
   return strm << "Position: (" << position.row << ',' << position.col << ')';
 };
 

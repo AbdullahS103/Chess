@@ -38,19 +38,19 @@ bool Board::isOnBoard(int row, int col) const{
 
 const int Board::getIndex(int row, int col) const{ 
   if (row < 0 || row >= this->rows)
-    throw InvalidIndexException("Invalid row " + to_string(row));
+    throw InvalidIndexException("Invalid row " + std::to_string(row));
   if (col < 0 || col >= this->columns)
-    throw InvalidIndexException("Invalid column " + to_string(col));
+    throw InvalidIndexException("Invalid column " + std::to_string(col));
   int index = row * this->columns + col;
   return index; 
 };
 
-ostream &operator<<(ostream &strm, const Board &board) {
+std::ostream &operator<<(std::ostream &strm, const Board &board) {
   return strm << board.toString();
 };
 
-string Board::toString() const {
-  string boardString = "";
+std::string Board::toString() const {
+  std::string boardString = "";
   for (int i = 0; i < this->boardSize; i++) {
     if (this->board[i] == nullptr)
       boardString += " .  ";
@@ -64,7 +64,7 @@ string Board::toString() const {
 
 ChessPiece *Board::getPiece(int row, int col) const{
   if (!isOnBoard(row, col))
-    throw InvalidIndexException("Invalid row " + to_string(row) + " and column " + to_string(col));
+    throw InvalidIndexException("Invalid row " + std::to_string(row) + " and column " + std::to_string(col));
   return this->board[this->getIndex(row, col)];
 }
 
@@ -119,10 +119,10 @@ bool Board::operator==(const Board &board) const{
 }
 
 bool Board::operator!=(const Board &board) const{ return !(*this == board); };
-bool Board::operator==(nullptr_t) const { return false; };
-bool Board::operator!=(nullptr_t) const { return true; };
-bool operator==(nullptr_t, const Board &board) { return false; };
-bool operator!=(nullptr_t, const Board &board) { return true; };
+bool Board::operator==(std::nullptr_t) const { return false; };
+bool Board::operator!=(std::nullptr_t) const { return true; };
+bool operator==(std::nullptr_t, const Board &board) { return false; };
+bool operator!=(std::nullptr_t, const Board &board) { return true; };
 
 int Board::getBlackStrength() const { return 0; };
 int Board::getWhiteStrength() const { return 0; };

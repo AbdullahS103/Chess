@@ -4,6 +4,5 @@
 #include <iostream>
 #include <stdexcept>
 #include <unordered_set>
-using namespace std;
 
 #endif

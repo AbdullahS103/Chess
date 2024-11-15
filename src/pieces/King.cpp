@@ -8,7 +8,7 @@ King::King(TeamColors color) : ChessPiece(color){
 };
 King::~King(){};
 
-string King::getSymbol() const { return this->symbol; }
+std::string King::getSymbol() const { return this->symbol; }
 
 bool King::isValidMove(Board &board, int fromRow, int fromCol, int toRow, int toCol) { 
   if (!board.isOnBoard(fromRow, fromCol) || !board.isOnBoard(toRow, toCol))
@@ -23,7 +23,7 @@ bool King::isValidMove(Board &board, int fromRow, int fromCol, int toRow, int to
   return rowDiff <= 1 && colDiff <= 1 && !(rowDiff == 0 && colDiff == 0);
 };
 
-unordered_set<int> King::getAllValidMoves(Board &board, int row, int col) {
+std::unordered_set<int> King::getAllValidMoves(Board &board, int row, int col) {
   std::unordered_set<int> validMoves;
   int rowOffset[] = {1, 1, 1, 0, 0, -1, -1, -1};
   int colOffset[] = {-1, 0, 1, -1, 1, -1, 0, 1};

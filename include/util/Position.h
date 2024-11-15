@@ -16,7 +16,7 @@ public:
   void setRow(int row);
   void setCol(int col);
   void setPosition(int row, int col);
-  friend ostream &operator<<(ostream &strm, const Position &position);
+  friend std::ostream &operator<<(std::ostream &strm, const Position &position);
 };
 
 #endif
