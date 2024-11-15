@@ -33,9 +33,11 @@ endif()
 message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
 
 # Group all files based on what they are, source or header files
-file(GLOB SOURCES "src/*.cpp")
-file(GLOB HEADERS "include/*.h")
-include_directories(${PROJECT_SOURCE_DIR}/include)
+file(GLOB_RECURSE SOURCES "src/*.cpp")
+file(GLOB_RECURSE HEADERS "include/*.h")
+include_directories(${PROJECT_SOURCE_DIR}/include/board)
+include_directories(${PROJECT_SOURCE_DIR}/include/util)
+include_directories(${PROJECT_SOURCE_DIR}/include/pieces)
 
 # Include googletest dependency, used for unit tests
 add_subdirectory(lib/googletest)
