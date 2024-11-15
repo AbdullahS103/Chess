@@ -1,9 +1,4 @@
 #include <gtest/gtest.h>
-#include "King.h"
-
-TEST(KingTest, AddTest) {
-  EXPECT_EQ(5, 5);
-}
 
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);

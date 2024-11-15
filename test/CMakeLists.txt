@@ -1,5 +1,5 @@
 # Add the test source files
-file(GLOB KING_TEST_SOURCES "*.cpp")
+file(GLOB KING_TEST_SOURCES "pieces/*.cpp")
 
 # Create the unit test executable for Google Test
 add_executable(KingTests ${KING_TEST_SOURCES})
