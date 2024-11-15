@@ -27,8 +27,13 @@ public:
   bool isSameTeam(TeamColors color);
   bool isSameTeam(ChessPiece *piece);
   
-  // Print the the identifier of a chess piece
-  friend ostream &operator<<(ostream &strm, const ChessPiece &chessPiece);
+  virtual bool operator==(const ChessPiece &piece) const;
+  virtual bool operator!=(const ChessPiece &piece) const;
+  bool operator==(nullptr_t) const;
+  bool operator!=(nullptr_t) const;
+  friend bool operator==(nullptr_t, const ChessPiece &piece);
+  friend bool operator!=(nullptr_t, const ChessPiece &piece);
+  friend ostream &operator<<(ostream &strm, const ChessPiece &piece);
 };
 
 #endif

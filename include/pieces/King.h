@@ -11,6 +11,9 @@ public:
   bool isValidMove(Board &board, int fromRow, int fromCol, int toRow, int toCol);
   unordered_set<int> getAllValidMoves(Board &board, int row, int col);
   string getSymbol() const;
+
+  bool operator==(const ChessPiece &piece) const;
+  bool operator!=(const ChessPiece &piece) const;
 };
 
 #endif

@@ -21,20 +21,28 @@ public:
   ~Board();
 
   // getters
-  int getRows();
-  int getColumns();
-  int getRow(int index);
-  int getColumn(int index);
-  const int getIndex(int row, int col);
-  ChessPiece *getPiece(int row, int col);
+  int getRows() const;
+  int getColumns() const;
+  int getRow(int index) const;
+  int getColumn(int index) const;
+  const int getIndex(int row, int col) const;
+  ChessPiece *getPiece(int row, int col) const;
+  ChessPiece *getPiece(int index) const;
 
   // setters
   void setPiece(int row, int col, ChessPiece *piece);
 
   void movePiece(int fromRow, int fromCol, int toRow, int toCol);
-  bool isOnBoard(int row, int col);
-  int getBlackStrength();
-  int getWhiteStrength();
+  bool isOnBoard(int row, int col) const;
+  int getBlackStrength() const;
+  int getWhiteStrength() const;
+
+  bool operator==(const Board &board) const;
+  bool operator!=(const Board &board) const;
+  bool operator==(nullptr_t) const;
+  bool operator!=(nullptr_t) const;
+  friend bool operator==(nullptr_t, const Board &board);
+  friend bool operator!=(nullptr_t, const Board &board);
   friend ostream &operator<<(ostream &strm, const Board &board);
 };
 
