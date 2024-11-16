@@ -11,6 +11,13 @@ Knight::~Knight(){};
 std::string Knight::getSymbol() const { return this->symbol; }
 
 bool Knight::isValidMove(Board &board, int fromRow, int fromCol, int toRow, int toCol) { 
+  if (!board.isOnBoard(fromRow, fromCol) || !board.isOnBoard(toRow, toCol))
+    return false;
+
+  ChessPiece *currentPiece = board.getPiece(toRow, toCol);
+  if (currentPiece != nullptr && currentPiece->isSameTeam(this->color))
+    return false;
+
   int rowDiff = abs(fromRow - toRow);
   int colDiff = abs(fromCol - toCol);
   if (rowDiff == 2 && colDiff == 1)
@@ -28,12 +35,19 @@ std::unordered_set<int> Knight::getAllValidMoves(Board &board, int row, int col)
   {
     int newRow = row + rowOffset[i];
     int newCol = col + colOffset[i];
-    if (!board.isOnBoard(newRow, newCol))
-      continue;
-
-    ChessPiece *currentPiece = board.getPiece(newRow, newCol);
-    if (currentPiece == nullptr || currentPiece->isSameTeam(this->color))
-        validMoves.insert(board.getIndex(newRow, newCol));
+    if (isValidMove(board, row, col, newRow, newCol))
+      validMoves.insert(board.getIndex(newRow, newCol));
   }
   return validMoves;
 }
+
+bool Knight::operator==(const ChessPiece &piece) const {
+  if (this == &piece)
+    return true;
+  if (typeid(piece) != typeid(Knight))
+    return false;
+
+  const Knight *knight = static_cast<const Knight*>(&piece);
+  return knight->color == color && knight->symbol == symbol;
+};
+bool Knight::operator!=(const ChessPiece &piece) const { return !(*this == piece); };
