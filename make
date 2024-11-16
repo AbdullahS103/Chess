@@ -6,12 +6,12 @@ if [ "$1" == "build" ]; then
 	cmake -S . -B build && cmake --build build
 	cp -f build/chess chess
 
-# build_and_test is like build, but also runs unit tests
-elif [ "$1" == "build_and_test" ]; then
+# test is like build, but also runs unit tests
+elif [ "$1" == "test" ]; then
 	cmake -S . -B build && cmake --build build && GTEST_COLOR=1 ctest --test-dir build --output-on-failure
 	cp -f build/chess chess
 
-# Clean simply removes chess executable
+# clean simply removes chess executable
 elif [ "$1" == "clean" ]; then
 	rm -f chess 
 	rm -rf build/
