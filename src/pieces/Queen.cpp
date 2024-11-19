@@ -11,34 +11,74 @@ Queen::~Queen(){};
 std::string Queen::getSymbol() const { return this->symbol; }
 
 bool Queen::isValidMove(Board &board, int fromRow, int fromCol, int toRow, int toCol) { 
+  if (!board.isOnBoard(fromRow, fromCol) || !board.isOnBoard(toRow, toCol))
+    return false;
+  // Move should not collide with piece of same team
+  ChessPiece *currentPiece = board.getPiece(toRow, toCol);
+  if (currentPiece != nullptr && currentPiece->isSameTeam(this->color))
+    return false;
+
   int rowDiff = abs(fromRow - toRow);
   int colDiff = abs(fromCol - toCol);
-  return (rowDiff == 0 || colDiff == 0) || (rowDiff == colDiff && rowDiff != 0);
+  // Move is not horizontal, vertical, or diagonal
+  if ((fromRow != toRow && fromCol != toCol) && (rowDiff != colDiff || rowDiff == 0))
+    return false;
+
+  int rowUnitNorm = toRow - fromRow; 
+  int colUnitNorm = toCol - fromCol;
+  if (rowDiff > 0)
+    rowUnitNorm /= rowDiff;
+  if (colDiff > 0)
+    colUnitNorm /= colDiff;
+
+  // Search in the direction of the movement
+  int newRow = fromRow + rowUnitNorm;
+  int newCol = fromCol + colUnitNorm;
+  while (newRow != toRow || newCol != toCol) {
+    // If you see a piece before destination, move is not valid (Queen cannot jump a piece)
+    if (board.getPiece(newRow, newCol) != nullptr)
+      return false;
+    newRow += rowUnitNorm;
+    newCol += colUnitNorm;
+  }
+
+  return true;
 };
 
 std::unordered_set<int> Queen::getAllValidMoves(Board &board, int row, int col) {
   std::unordered_set<int> validMoves;
-  int rowOffset[] = {1, -1, 0, 0, 1, 1, -1, -1};
-  int colOffset[] = {0, 0, 1, -1, 1, -1, 1, -1};
-  for (int i = 0; i < 8; i++) 
-  {
-    while (true)
-    {
-      int newRow = row + rowOffset[i];
-      int newCol = col + colOffset[i];
-      if (!board.isOnBoard(newRow, newCol))
-        break;
-      
+  int rowOffset[] = {1, 1, -1, -1, 1, -1, 0, 0};
+  int colOffset[] = {1, -1, 1, -1, 0, 0, 1, -1};
+
+  // Iterate through all 8 directions queen can go
+  for (int i = 0; i < 8; i++) {
+    int newRow = row + rowOffset[i];
+    int newCol = col + colOffset[i];
+
+    while (board.isOnBoard(newRow, newCol)) { 
+      // If a piece is in the way, can stop searching early
       ChessPiece *currentPiece = board.getPiece(newRow, newCol);
-      if (currentPiece == nullptr) {
-        validMoves.insert(board.getIndex(newRow, newCol));
-      } else if (!currentPiece->isSameTeam(this->color)) {
-        validMoves.insert(board.getIndex(newRow, newCol));
-        break;
-      } else {
+      if (currentPiece != nullptr) {
+        if (!currentPiece->isSameTeam(this->color))
+          validMoves.insert(board.getIndex(newRow, newCol));
         break;
       }
+        
+      validMoves.insert(board.getIndex(newRow, newCol));
+      newRow += rowOffset[i];
+      newCol += colOffset[i];
     }
   }
   return validMoves;
 }
+
+bool Queen::operator==(const ChessPiece &piece) const {
+  if (this == &piece)
+    return true;
+  if (typeid(piece) != typeid(Queen))
+    return false;
+
+  const Queen *rook = static_cast<const Queen*>(&piece);
+  return rook->color == color && rook->symbol == symbol;
+};
+bool Queen::operator!=(const ChessPiece &piece) const { return !(*this == piece); };
