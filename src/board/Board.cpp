@@ -111,7 +111,7 @@ bool Board::operator==(const Board &board) const{
     // one ptr is null and the other is not
     if ((piece1 && !piece2) || (piece2 && !piece1))
       return false;
-    // both ptrs are not null
+    // both ptrs are not null, but pieces are different
     if (*piece1 != *piece2)
       return false;
   }

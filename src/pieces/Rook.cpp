@@ -13,9 +13,10 @@ std::string Rook::getSymbol() const { return this->symbol; }
 bool Rook::isValidMove(Board &board, int fromRow, int fromCol, int toRow, int toCol) { 
   if (!board.isOnBoard(fromRow, fromCol) || !board.isOnBoard(toRow, toCol))
     return false;
+  // Move is not horizontal nor vertical
   if (fromRow != toRow && fromCol != toCol)
     return false;
-
+  // Move should not collide with piece of same team
   ChessPiece *currentPiece = board.getPiece(toRow, toCol);
   if (currentPiece != nullptr && currentPiece->isSameTeam(this->color))
     return false;
