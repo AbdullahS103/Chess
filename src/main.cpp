@@ -9,7 +9,7 @@ int main() {
   std::cout << board;
   std::cout << "board ending" << std::endl;
 
-  board.movePiece(0, 1, 1, 3);
+  board.movePiece(0, 1, 2, 2);
   std::cout << "board beginning" << std::endl;
   std::cout << board;
   std::cout << "board ending" << std::endl;
