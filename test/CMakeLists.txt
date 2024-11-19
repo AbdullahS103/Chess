@@ -25,3 +25,15 @@ file(GLOB ROOK_TEST_SOURCE "pieces/RookTest.cpp")
 add_executable(RookTests ${ROOK_TEST_SOURCE})
 target_link_libraries(RookTests gtest gtest_main chess_lib)
 add_test(NAME RookTests COMMAND RookTests)
+
+# Bishop Unit Tests
+file(GLOB BISHOP_TEST_SOURCE "pieces/BishopTest.cpp")
+add_executable(BishopTests ${BISHOP_TEST_SOURCE})
+target_link_libraries(BishopTests gtest gtest_main chess_lib)
+add_test(NAME BishopTests COMMAND BishopTests)
+
+# Queen Unit Tests
+file(GLOB QUEEN_TEST_SOURCE "pieces/QueenTest.cpp")
+add_executable(QueenTests ${QUEEN_TEST_SOURCE})
+target_link_libraries(QueenTests gtest gtest_main chess_lib)
+add_test(NAME QueenTests COMMAND QueenTests)
