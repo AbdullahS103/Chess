@@ -37,3 +37,9 @@ file(GLOB QUEEN_TEST_SOURCE "pieces/QueenTest.cpp")
 add_executable(QueenTests ${QUEEN_TEST_SOURCE})
 target_link_libraries(QueenTests gtest gtest_main chess_lib)
 add_test(NAME QueenTests COMMAND QueenTests)
+
+# Pawn Unit Tests
+file(GLOB PAWN_TEST_SOURCE "pieces/PawnTest.cpp")
+add_executable(PawnTests ${PAWN_TEST_SOURCE})
+target_link_libraries(PawnTests gtest gtest_main chess_lib)
+add_test(NAME PawnTests COMMAND PawnTests)
