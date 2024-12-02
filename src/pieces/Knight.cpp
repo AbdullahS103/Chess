@@ -41,6 +41,25 @@ std::unordered_set<int> Knight::getAllValidMoves(Board &board, int row, int col)
   return validMoves;
 }
 
+std::unordered_set<int> Knight::getAllPossibleMoves(const Board &board, int index) {
+  return getAllPossibleMoves(board, board.getRow(index), board.getColumn(index));
+}
+
+std::unordered_set<int> Knight::getAllPossibleMoves(const Board &board, int row, int col) {
+  std::unordered_set<int> validMoves;
+  int rowOffset[] = {2, 1, -1, -2, -2, -1, 1, 2};
+  int colOffset[] = {1, 2, 2, 1, -1, -2, -2, -1};
+  for (int i = 0; i < 8; i++) 
+  {
+    int newRow = row + rowOffset[i];
+    int newCol = col + colOffset[i];
+    if (!board.isOnBoard(newRow, newCol))
+      continue;
+    validMoves.insert(board.getIndex(newRow, newCol));
+  }
+  return validMoves;
+}
+
 bool Knight::operator==(const ChessPiece &piece) const {
   if (this == &piece)
     return true;
