@@ -10,3 +10,4 @@ chess-debug
 # Directories 
 build/
 lib/
+.vscode/
