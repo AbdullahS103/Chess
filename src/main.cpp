@@ -1,17 +1,7 @@
-#include "Board.h"
-#include "BoardStateGenerator.h"
+#include "GameManager.h"
 
 int main() {
-  Board board = Board();
-  BoardStateGenerator::standardBoard(board);
-  
-  std::cout << "board beginning" << std::endl;
-  std::cout << board;
-  std::cout << "board ending" << std::endl;
-
-  board.movePiece(0, 1, 2, 2);
-  std::cout << "board beginning" << std::endl;
-  std::cout << board;
-  std::cout << "board ending" << std::endl;
+  GameManager test = GameManager();
+  std::cout << test.inCheck(TeamColors::WHITE) << std::endl;
   return 0;
 }

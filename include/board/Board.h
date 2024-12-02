@@ -15,6 +15,8 @@ class Board {
 
   std::string toString() const;
 
+  friend class GameManager;
+
 public:
   Board();
   Board(int rows, int cols);
