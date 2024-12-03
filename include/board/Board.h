@@ -15,8 +15,6 @@ class Board {
 
   std::string toString() const;
 
-  friend class GameManager;
-
 public:
   Board();
   Board(int rows, int cols);
@@ -25,6 +23,7 @@ public:
   // getters
   int getRows() const;
   int getColumns() const;
+  int getBoardSize() const;
   int getRow(int index) const;
   int getColumn(int index) const;
   const int getIndex(int row, int col) const;

@@ -9,7 +9,7 @@ class Board;
 
 // GameManager class handles getting information on Board state, chess moves, player strength calculations, etc.
 class GameManager {
-  Board board;
+  Board *board;
   int whiteKingIndex;
   int blackKingIndex;
   std::vector<std::unique_ptr<SpecialPieces>> specialPieces;

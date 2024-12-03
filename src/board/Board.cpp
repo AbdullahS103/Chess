@@ -29,6 +29,7 @@ Board::~Board() {
 
 int Board::getRows() const { return this->rows; };
 int Board::getColumns() const { return this->columns; };
+int Board::getBoardSize() const { return this->boardSize; };
 int Board::getRow(int index) const { return index / this->columns; };
 int Board::getColumn(int index) const { return index % this->columns; };
 
