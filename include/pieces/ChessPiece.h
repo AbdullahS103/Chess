@@ -23,6 +23,10 @@ public:
   virtual std::unordered_set<int> getAllValidMoves(Board &board, int row, int col);
   // Return a unique character associated with piece (mainly for debugging :0)
   virtual std::string getSymbol() const;
+  // Returns if move is valid, ignoring current board state
+  //virtual bool isValidMove(int fromRow, int fromCol, int toRow, int toCol);
+  // Returns a set of indexes that correspond to the squares the piece currently controls
+  //virtual std::unordered_set<int> getAllControlSquares(Board &board, int row, int col);
 
   bool isSameTeam(TeamColors color);
   bool isSameTeam(ChessPiece *piece);

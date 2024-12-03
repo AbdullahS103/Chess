@@ -45,3 +45,27 @@ void BoardStateGenerator::standardBoard(Board &board) {
   board.setPiece(6, 6, new Pawn(TeamColors::WHITE));
   board.setPiece(6, 7, new Pawn(TeamColors::WHITE));
 }
+
+void BoardStateGenerator::testBoard(Board &board) {
+  if (board.getColumns() != 8 || board.getRows() != 8) 
+    throw new InvalidBoardException("ERROR: Invalid board size for standard board");
+
+  board.setPiece(0, 0, new Rook(TeamColors::BLACK));
+  board.setPiece(0, 1, new Knight(TeamColors::BLACK));
+  board.setPiece(0, 2, new Bishop(TeamColors::BLACK));
+  board.setPiece(0, 3, new Queen(TeamColors::BLACK));
+  board.setPiece(0, 4, new King(TeamColors::BLACK));
+  board.setPiece(0, 5, new Bishop(TeamColors::BLACK));
+  board.setPiece(0, 6, new Knight(TeamColors::BLACK));
+  board.setPiece(0, 7, new Rook(TeamColors::BLACK));
+  board.setPiece(1, 0, new Pawn(TeamColors::BLACK));
+  board.setPiece(1, 1, new Pawn(TeamColors::BLACK));
+  board.setPiece(1, 2, new Pawn(TeamColors::BLACK));
+  board.setPiece(1, 4, new Pawn(TeamColors::BLACK));
+  board.setPiece(1, 5, new Pawn(TeamColors::BLACK));
+  board.setPiece(1, 6, new Pawn(TeamColors::BLACK));
+  board.setPiece(1, 7, new Pawn(TeamColors::BLACK));
+
+
+  board.setPiece(7, 3, new King(TeamColors::WHITE));
+}

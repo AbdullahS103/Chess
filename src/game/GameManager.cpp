@@ -13,6 +13,15 @@ GameManager::GameManager() {
   this->specialPieces.push_back(std::make_unique<Knight>(TeamColors::WHITE));
 }
 
+GameManager::GameManager(int randomInteger) {
+  this->board = new Board();
+  BoardStateGenerator::testBoard(*this->board);
+
+  this->whiteKingIndex = getKingIndex(TeamColors::WHITE);
+  this->blackKingIndex = getKingIndex(TeamColors::BLACK);
+  this->specialPieces.push_back(std::make_unique<Knight>(TeamColors::WHITE));
+}
+
 GameManager::~GameManager() {
   delete board;
 }
@@ -26,7 +35,9 @@ bool GameManager::inCheck(TeamColors team) const {
       ChessPiece *ptr = board->getPiece(index);
       if (!ptr)
         continue;
-      if (typeid(*ptr) != typeid(*piece.get()))
+      // Workaround: Fixes a warning
+      auto &piece_ref = *piece.get();
+      if (typeid(*ptr) != typeid(piece_ref))
         continue;
       if (ptr->isSameTeam(team))
         continue;
@@ -34,29 +45,43 @@ bool GameManager::inCheck(TeamColors team) const {
     }
   }
 
-  // int rowOffset[] = {1, 1, -1, -1, 1, -1, 0, 0};
-  // int colOffset[] = {1, -1, 1, -1, 0, 0, 1, -1};
+  int rowOffset[] = {1, 1, -1, -1, 1, -1, 0, 0};
+  int colOffset[] = {1, -1, 1, -1, 0, 0, 1, -1};
+  int kingRow = board->getRow(kingIndex);
+  int kingCol = board->getColumn(kingIndex);
 
-  // // Iterate through all 8 directions queen can go
-  // for (int i = 0; i < 8; i++) {
-  //   int newRow = row + rowOffset[i];
-  //   int newCol = col + colOffset[i];
+  // Iterate through all 8 directions to see if King is in check
+  for (int i = 0; i < 8; i++) {
+    int newRow = kingRow + rowOffset[i];
+    int newCol = kingCol + colOffset[i];
 
-  //   while (board.isOnBoard(newRow, newCol)) { 
-  //     // If a piece is in the way, can stop searching early
-  //     ChessPiece *currentPiece = board.getPiece(newRow, newCol);
-  //     if (currentPiece != nullptr) {
-  //       if (!currentPiece->isSameTeam(this->color))
-  //         validMoves.insert(board.getIndex(newRow, newCol));
-  //       break;
-  //     }
+    while (board->isOnBoard(newRow, newCol)) { 
+      ChessPiece *currentPiece = board->getPiece(newRow, newCol);
+      // If a piece is in the way, can stop searching early
+      if (!currentPiece) {
+        newRow += rowOffset[i];
+        newCol += colOffset[i];
+        continue;
+      }
         
-  //     validMoves.insert(board.getIndex(newRow, newCol));
-  //     newRow += rowOffset[i];
-  //     newCol += colOffset[i];
-  //   }
-  // }
+      if (currentPiece->isSameTeam(team)) 
+        break;
+      // If piece can move to king, king is in check
+      if (currentPiece->isValidMove(*board, newRow, newCol, kingRow, kingCol))
+        return true;
+
+      newRow += rowOffset[i];
+      newCol += colOffset[i];
+    }
+  }
   return false;
+}
+
+bool GameManager::inCheckmate(TeamColors team) const{
+  if (!inCheck(team))
+    return false;
+
+  return true;
 }
 
 int GameManager::getKingIndex(TeamColors team) {

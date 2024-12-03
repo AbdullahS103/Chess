@@ -8,6 +8,7 @@ class Board;
 class BoardStateGenerator {
   public:
     static void standardBoard(Board &board);
+    static void testBoard(Board &board);
 };
 
 #endif 
