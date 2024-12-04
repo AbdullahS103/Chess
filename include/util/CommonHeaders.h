@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <unordered_set>
 #include <vector>
+#include <sstream>
 #include <memory>
 #include <map>
 
