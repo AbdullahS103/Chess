@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "Rook.h"
+#include "King.h"
 #include "Board.h"
 
 // Rook can move horizontally
@@ -145,7 +146,7 @@ TEST(RookTests, OperatorTest1) {
 
 TEST(RookTests, OperatorTest2) {
   Rook rook = Rook(TeamColors::WHITE);
-  ChessPiece piece = ChessPiece(TeamColors::WHITE);
+  King piece = King(TeamColors::WHITE);
 
   EXPECT_TRUE(rook != piece);
   EXPECT_FALSE(rook == piece);

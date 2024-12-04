@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "Knight.h"
+#include "King.h"
 #include "Board.h"
 
 // Knight should be able to move lol
@@ -111,7 +112,7 @@ TEST(KnightTests, OperatorTest1) {
 
 TEST(KnightTests, OperatorTest2) {
   Knight knight = Knight(TeamColors::WHITE);
-  ChessPiece piece = ChessPiece(TeamColors::WHITE);
+  King piece = King(TeamColors::WHITE);
 
   EXPECT_TRUE(knight != piece);
   EXPECT_FALSE(knight == piece);

@@ -150,7 +150,4 @@ TEST(KingTests, OperatorTest2) {
   EXPECT_FALSE(king == queen);
 }
 
-// Include tests for moving into checks
-// Include tests for castling
-
 

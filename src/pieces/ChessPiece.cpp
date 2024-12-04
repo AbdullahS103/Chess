@@ -1,41 +1,47 @@
 #include "ChessPiece.h"
 #include "Errors.h"
 
-// Constructor for ChessPiece
-ChessPiece::ChessPiece(TeamColors color) { 
+ChessPiece::ChessPiece(TeamColors color, std::string symbol) { 
   this->color = color; 
+  this->symbol = symbol;
 }
 
-// Destructor for ChessPiece, its a formality but it is good practice
-ChessPiece::~ChessPiece(){};
-
-std::ostream &operator<<(std::ostream &strm, const ChessPiece &piece) { return strm << piece.getSymbol() << std::endl; };
-
-bool ChessPiece::isValidMove(Board &board, int fromRow, int fromCol, int toRow, int toCol) {
-  throw UnsupportedFunctionException("Class ChessPiece does not support isValidMove");
+std::ostream &operator<<(std::ostream &strm, const ChessPiece &piece) { 
+  return strm << piece.getSymbol() << std::endl; 
 };
 
-std::unordered_set<int> ChessPiece::getAllValidMoves(Board &board, int row, int col) {
-  throw UnsupportedFunctionException( "Class ChessPiece does not support getAllValidMoves");
+bool ChessPiece::isSameTeam(ChessPiece *piece) { 
+  return (piece == nullptr ? false : color == piece->color); 
 }
 
-std::string ChessPiece::getSymbol() const {
-  throw UnsupportedFunctionException("Class ChessPiece does not support getSymbol");
+std::string ChessPiece::getSymbol() const { 
+  return this->symbol; 
+};
+
+TeamColors ChessPiece::getColor() const {
+  return this->color;
 }
 
-bool ChessPiece::isSameTeam(TeamColors color) { return this->color == color; }
-
-bool ChessPiece::isSameTeam(ChessPiece *piece) {
-  if (piece == nullptr)
-    return false;
-  return this->color == piece->color;
+bool ChessPiece::isSameTeam(TeamColors color) { 
+  return this->color == color;
 }
 
-bool ChessPiece::operator==(const ChessPiece &piece) const {
-  throw UnsupportedFunctionException("Class ChessPiece does not support == operation");
-}
-bool ChessPiece::operator!=(const ChessPiece &piece) const { return !(*this == piece); };
-bool ChessPiece::operator==(std::nullptr_t) const { return false; };
-bool ChessPiece::operator!=(std::nullptr_t) const { return true; };
-bool operator==(std::nullptr_t, const ChessPiece &piece) { return false; };
-bool operator!=(std::nullptr_t, const ChessPiece &piece) { return true; };
+bool ChessPiece::operator!=(const ChessPiece &piece) const { 
+  return !(*this == piece);
+};
+
+bool ChessPiece::operator==(std::nullptr_t) const { 
+  return false; 
+};
+
+bool ChessPiece::operator!=(std::nullptr_t) const { 
+  return true; 
+};
+
+bool operator==(std::nullptr_t, const ChessPiece &piece) { 
+  return false; 
+};
+
+bool operator!=(std::nullptr_t, const ChessPiece &piece) { 
+  return true; 
+};

@@ -1,14 +1,6 @@
 #include "Rook.h"
 
-Rook::Rook(TeamColors color) : ChessPiece(color){
-  if (color == TeamColors::WHITE)
-    this->symbol = "♖";
-  else 
-    this->symbol = "♜";
-};
-Rook::~Rook(){};
-
-std::string Rook::getSymbol() const { return this->symbol; }
+Rook::Rook(TeamColors color) : ChessPiece(color, (color == TeamColors::WHITE ? "♖" : "♜")){};
 
 bool Rook::isValidMove(Board &board, int fromRow, int fromCol, int toRow, int toCol) { 
   if (!board.isOnBoard(fromRow, fromCol) || !board.isOnBoard(toRow, toCol))
@@ -18,7 +10,7 @@ bool Rook::isValidMove(Board &board, int fromRow, int fromCol, int toRow, int to
     return false;
   // Move should not collide with piece of same team
   ChessPiece *currentPiece = board.getPiece(toRow, toCol);
-  if (currentPiece != nullptr && currentPiece->isSameTeam(this->color))
+  if (currentPiece && currentPiece->isSameTeam(this->color))
     return false;
 
   int rowDiff = abs(fromRow - toRow);
@@ -57,7 +49,7 @@ std::unordered_set<int> Rook::getAllValidMoves(Board &board, int row, int col) {
     while (board.isOnBoard(newRow, newCol)) { 
       // If a piece is in the way, can stop searching early
       ChessPiece *currentPiece = board.getPiece(newRow, newCol);
-      if (currentPiece != nullptr) {
+      if (currentPiece) {
         if (!currentPiece->isSameTeam(this->color))
           validMoves.insert(board.getIndex(newRow, newCol));
         break;
@@ -71,6 +63,28 @@ std::unordered_set<int> Rook::getAllValidMoves(Board &board, int row, int col) {
   return validMoves;
 }
 
+std::unordered_set<int> Rook::getAllControlSquares(Board &board, int row, int col) {
+  std::unordered_set<int> controlSquares;
+  int rowOffset[] = {1, -1, 0, 0};
+  int colOffset[] = {0, 0, 1, -1};
+
+  // Iterate through all 4 diagonal directions
+  for (int i = 0; i < 4; i++) {
+    int newRow = row + rowOffset[i];
+    int newCol = col + colOffset[i];
+
+    while (board.isOnBoard(newRow, newCol)) { 
+      controlSquares.insert(board.getIndex(newRow, newCol));
+      // If a piece is in the way, break early
+      if (board.getPiece(newRow, newCol)) 
+        break;
+      newRow += rowOffset[i];
+      newCol += colOffset[i];
+    }
+  }
+  return controlSquares;
+}
+
 bool Rook::operator==(const ChessPiece &piece) const {
   if (this == &piece)
     return true;
@@ -80,4 +94,3 @@ bool Rook::operator==(const ChessPiece &piece) const {
   const Rook *rook = static_cast<const Rook*>(&piece);
   return rook->color == color && rook->symbol == symbol;
 };
-bool Rook::operator!=(const ChessPiece &piece) const { return !(*this == piece); };

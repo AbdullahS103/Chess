@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "Bishop.h"
+#include "King.h"
 #include "Board.h"
 
 // Bishop can move diagonally
@@ -127,7 +128,7 @@ TEST(BishopTests, OperatorTest1) {
 
 TEST(BishopTests, OperatorTest2) {
   Bishop bishop = Bishop(TeamColors::WHITE);
-  ChessPiece piece = ChessPiece(TeamColors::WHITE);
+  King piece = King(TeamColors::WHITE);
 
   EXPECT_TRUE(bishop != piece);
   EXPECT_FALSE(bishop == piece);

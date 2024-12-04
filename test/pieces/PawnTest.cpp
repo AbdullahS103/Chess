@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "Pawn.h"
+#include "King.h"
 #include "Board.h"
 
 // Pawn can move vertically (assume white)
@@ -160,7 +161,7 @@ TEST(PawnTests, OperatorTest1) {
 
 TEST(PawnTests, OperatorTest2) {
   Pawn pawn = Pawn(TeamColors::WHITE);
-  ChessPiece piece = ChessPiece(TeamColors::WHITE);
+  King piece = King(TeamColors::WHITE);
 
   EXPECT_TRUE(pawn != piece);
   EXPECT_FALSE(pawn == piece);

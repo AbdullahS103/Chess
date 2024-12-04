@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "Queen.h"
+#include "King.h"
 #include "Board.h"
 
 // Queen can move horizontally
@@ -182,7 +183,7 @@ TEST(QueenTests, OperatorTest1) {
 
 TEST(QueenTests, OperatorTest2) {
   Queen queen = Queen(TeamColors::WHITE);
-  ChessPiece piece = ChessPiece(TeamColors::WHITE);
+  King piece = King(TeamColors::WHITE);
 
   EXPECT_TRUE(queen != piece);
   EXPECT_FALSE(queen == piece);
