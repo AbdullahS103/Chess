@@ -33,7 +33,9 @@ class GameManager {
   std::map<int, ChessPiece*> blackPieceMap;
   
   // Individually track pieces that can jump other pieces (ie. Knight)
-  std::vector<ChessPiece*> jumpers;
+  //   key   -> Chess piece
+  //   value -> index
+  std::map<ChessPiece*, int> jumpers;
 
   int getKingIndex(TeamColors team);
 
