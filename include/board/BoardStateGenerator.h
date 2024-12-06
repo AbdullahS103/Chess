@@ -4,11 +4,21 @@
 #include "CommonHeaders.h"
 
 class Board;
+class ChessPiece;
 
 class BoardStateGenerator {
-  public:
-    static void standardBoard(Board &board);
-    static void testBoard(Board &board);
+
+  static const std::string STANDARD_CHESS_BOARD_FEN;
+
+  static ChessPiece* createPiece(char c);
+
+public:
+
+  // Sets up a standard game of chess
+  static void standardBoard(Board &board);
+
+  // Creates board based on FEN string
+  static void FENBoard(Board &board, std::string fenString);
 };
 
 #endif 

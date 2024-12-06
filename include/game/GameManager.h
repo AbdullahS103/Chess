@@ -43,15 +43,19 @@ class GameManager {
 
   bool isPiecePinnedToKing(int kingIndex, int pieceIndex);
 
-  // Meant for debugging data structures
+  bool isValidFEN(std::string &fenString);
+  
+  // Meant for debugging data structures, will get deleted on final build
   void printPieceMap(TeamColors team) const;
+
   void printControlMap(TeamColors team) const;
+
   void printSpecialPieces() const;
 
 public:
   GameManager();
 
-  GameManager(int randomInteger);
+  GameManager(std::string fenString);
 
   ~GameManager();
 

@@ -1,6 +1,7 @@
 #include "GameManager.h"
 #include "BoardStateGenerator.h"
 #include "King.h"
+#include "Errors.h"
 
 GameManager::GameManager() {
   this->board = new Board();
@@ -9,16 +10,23 @@ GameManager::GameManager() {
   intializeMemberVariables();
 }
 
-GameManager::GameManager(int randomInteger) {
+GameManager::GameManager(std::string fenString) {
   this->board = new Board();
   this->emptyBoard = new Board();
-  BoardStateGenerator::testBoard(*this->board);
+  
+  if (!isValidFEN(fenString)) 
+    throw new InvalidInputException("ERROR: Invalid FEN");
+  BoardStateGenerator::FENBoard(*this->board, fenString);
   intializeMemberVariables();
 }
 
 GameManager::~GameManager() {
   delete board;
   delete emptyBoard;
+}
+
+bool GameManager::isValidFEN(std::string &fenString) {
+  return true;
 }
 
 int GameManager::getKingIndex(TeamColors team) {

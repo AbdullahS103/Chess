@@ -7,65 +7,43 @@
 #include "Pawn.h"
 #include "Errors.h"
 
+const std::string BoardStateGenerator::STANDARD_CHESS_BOARD_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+
 void BoardStateGenerator::standardBoard(Board &board) {
   if (board.getColumns() != 8 || board.getRows() != 8) 
     throw new InvalidBoardException("ERROR: Invalid board size for standard board");
 
-  board.setPiece(0, 0, new Rook(TeamColors::BLACK));
-  board.setPiece(0, 1, new Knight(TeamColors::BLACK));
-  board.setPiece(0, 2, new Bishop(TeamColors::BLACK));
-  board.setPiece(0, 3, new Queen(TeamColors::BLACK));
-  board.setPiece(0, 4, new King(TeamColors::BLACK));
-  board.setPiece(0, 5, new Bishop(TeamColors::BLACK));
-  board.setPiece(0, 6, new Knight(TeamColors::BLACK));
-  board.setPiece(0, 7, new Rook(TeamColors::BLACK));
-  board.setPiece(1, 0, new Pawn(TeamColors::BLACK));
-  board.setPiece(1, 1, new Pawn(TeamColors::BLACK));
-  board.setPiece(1, 2, new Pawn(TeamColors::BLACK));
-  board.setPiece(1, 3, new Pawn(TeamColors::BLACK));
-  board.setPiece(1, 4, new Pawn(TeamColors::BLACK));
-  board.setPiece(1, 5, new Pawn(TeamColors::BLACK));
-  board.setPiece(1, 6, new Pawn(TeamColors::BLACK));
-  board.setPiece(1, 7, new Pawn(TeamColors::BLACK));
-
-  board.setPiece(7, 0, new Rook(TeamColors::WHITE));
-  board.setPiece(7, 1, new Knight(TeamColors::WHITE));
-  board.setPiece(7, 2, new Bishop(TeamColors::WHITE));
-  board.setPiece(7, 3, new King(TeamColors::WHITE));
-  board.setPiece(7, 4, new Queen(TeamColors::WHITE));
-  board.setPiece(7, 5, new Bishop(TeamColors::WHITE));
-  board.setPiece(7, 6, new Knight(TeamColors::WHITE));
-  board.setPiece(7, 7, new Rook(TeamColors::WHITE));
-  board.setPiece(6, 0, new Pawn(TeamColors::WHITE));
-  board.setPiece(6, 1, new Pawn(TeamColors::WHITE));
-  board.setPiece(6, 2, new Pawn(TeamColors::WHITE));
-  board.setPiece(6, 3, new Pawn(TeamColors::WHITE));
-  board.setPiece(6, 4, new Pawn(TeamColors::WHITE));
-  board.setPiece(6, 5, new Pawn(TeamColors::WHITE));
-  board.setPiece(6, 6, new Pawn(TeamColors::WHITE));
-  board.setPiece(6, 7, new Pawn(TeamColors::WHITE));
+  return FENBoard(board, STANDARD_CHESS_BOARD_FEN);
 }
 
-void BoardStateGenerator::testBoard(Board &board) {
-  if (board.getColumns() != 8 || board.getRows() != 8) 
-    throw new InvalidBoardException("ERROR: Invalid board size for standard board");
+void BoardStateGenerator::FENBoard(Board &board, std::string fenString) {
+  int boardIndex = 0;
+  for (int i = 0; i < fenString.length(); i++) {
+    char c = fenString.at(i);
+    if (c == '/')
+      continue;
+    board.setPiece(board.getRow(boardIndex), board.getColumn(boardIndex), createPiece(c));
+    if (isdigit(c))
+      boardIndex += c - '0';
+    else 
+      boardIndex++;
+  }
+}
 
-  board.setPiece(0, 0, new Rook(TeamColors::BLACK));
-  board.setPiece(0, 1, new Knight(TeamColors::BLACK));
-  board.setPiece(0, 2, new Bishop(TeamColors::BLACK));
-  board.setPiece(0, 3, new Queen(TeamColors::BLACK));
-  board.setPiece(0, 4, new King(TeamColors::BLACK));
-  board.setPiece(0, 5, new Bishop(TeamColors::BLACK));
-  board.setPiece(0, 6, new Knight(TeamColors::BLACK));
-  board.setPiece(0, 7, new Rook(TeamColors::BLACK));
-  board.setPiece(1, 0, new Pawn(TeamColors::BLACK));
-  board.setPiece(1, 1, new Pawn(TeamColors::BLACK));
-  board.setPiece(1, 2, new Pawn(TeamColors::BLACK));
-  board.setPiece(1, 4, new Pawn(TeamColors::BLACK));
-  board.setPiece(1, 5, new Pawn(TeamColors::BLACK));
-  board.setPiece(1, 6, new Pawn(TeamColors::BLACK));
-  board.setPiece(1, 7, new Pawn(TeamColors::BLACK));
-
-
-  board.setPiece(7, 3, new King(TeamColors::WHITE));
+ChessPiece* BoardStateGenerator::createPiece(char c) {
+  switch (c) {
+    case 'P': return new Pawn(TeamColors::WHITE);
+    case 'p': return new Pawn(TeamColors::BLACK);
+    case 'R': return new Rook(TeamColors::WHITE);
+    case 'r': return new Rook(TeamColors::BLACK);
+    case 'B': return new Bishop(TeamColors::WHITE);
+    case 'b': return new Bishop(TeamColors::BLACK);
+    case 'N': return new Knight(TeamColors::WHITE);
+    case 'n': return new Knight(TeamColors::BLACK);
+    case 'Q': return new Queen(TeamColors::WHITE);
+    case 'q': return new Queen(TeamColors::BLACK);
+    case 'K': return new King(TeamColors::WHITE);
+    case 'k': return new King(TeamColors::BLACK);
+    default: return nullptr;
+  }
 }
