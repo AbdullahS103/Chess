@@ -1,5 +1,6 @@
 #include "GameManager.h"
 #include "BoardStateGenerator.h"
+#include "FENManager.h"
 #include "King.h"
 #include "Errors.h"
 
@@ -13,10 +14,14 @@ GameManager::GameManager() {
 GameManager::GameManager(std::string fenString) {
   this->board = new Board();
   this->emptyBoard = new Board();
-  
-  if (!isValidFEN(fenString)) 
+
+  // Validate the FEN string and initialize the board based on FEN
+  if (!FENManager::isValidFEN(fenString)) 
     throw new InvalidInputException("ERROR: Invalid FEN");
-  BoardStateGenerator::FENBoard(*this->board, fenString);
+  BoardStateGenerator::FENBoard(*this->board, FENManager::getBoardLayout(fenString));
+  std::cout << *board << std::endl;
+  
+  // Iterate through board to initialize variables to correctly track board state
   intializeMemberVariables();
 }
 
@@ -82,7 +87,7 @@ void GameManager::intializeMemberVariables() {
     // Track pieces that can jump seperatly
     JumpType* specialPiece = dynamic_cast<JumpType*>(piece);
     if (specialPiece) 
-        jumpers[piece] = i;
+      jumpers[piece] = i;
   }
 }
 
@@ -247,7 +252,7 @@ void GameManager::printSpecialPieces() const {
   for (auto it = jumpers.begin(); it != jumpers.end(); ++it)  {
     oss << it->first->getSymbol() << " ";
     if (std::next(it) != jumpers.end()) { // Add a comma between elements, but not after the last one
-        oss << ", ";
+      oss << ", ";
     }
   }
   oss << "]";
@@ -259,24 +264,39 @@ void GameManager::printPieceMap(TeamColors team) const {
   std::ostringstream oss;
   oss << "{";
   for (auto it = map.begin(); it != map.end(); ++it) {
-      oss << std::to_string(it->first) << ": " << it->second->getSymbol();
-      if (std::next(it) != map.end()) { // Add a comma between key-value pairs, but not after the last one
-          oss << ", ";
-      }
+    oss << std::to_string(it->first) << ": " << it->second->getSymbol();
+    if (std::next(it) != map.end()) { // Add a comma between key-value pairs, but not after the last one
+      oss << ", ";
+    }
   }
   oss << "}";
   std::cout << oss.str() << std::endl;
 }
 
-void GameManager::printControlMap(TeamColors team) const {
+void GameManager::printControlSpaces(TeamColors team) const {
   std::map<int, int> map = (team == TeamColors::WHITE ? whiteControlledSpaces : blackControlledSpaces);
   std::ostringstream oss;
   oss << "{";
   for (auto it = map.begin(); it != map.end(); ++it) {
-      oss << std::to_string(it->first) << ": " << std::to_string(it->second);
-      if (std::next(it) != map.end()) { // Add a comma between key-value pairs, but not after the last one
-          oss << ", ";
-      }
+    oss << std::to_string(it->first) << ": " << std::to_string(it->second);
+    if (std::next(it) != map.end()) { // Add a comma between key-value pairs, but not after the last one
+      oss << ", ";
+    }
+  }
+  oss << "}";
+  std::cout << oss.str() << std::endl;
+}
+
+void GameManager::printTeamControlMap(TeamColors team) const {
+  std::map<ChessPiece*, std::unordered_set<int>> map = (team == TeamColors::WHITE ? whitePieceControlMap : blackPieceControlMap);
+  std::ostringstream oss;
+  oss << "{";
+  for (auto it = map.begin(); it != map.end(); ++it) {
+    oss << *it->first;
+    for (int index : it->second) {
+      oss << " " << std::to_string(index) << " , ";
+    }
+    oss << std::endl;
   }
   oss << "}";
   std::cout << oss.str() << std::endl;

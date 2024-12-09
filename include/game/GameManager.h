@@ -48,7 +48,9 @@ class GameManager {
   // Meant for debugging data structures, will get deleted on final build
   void printPieceMap(TeamColors team) const;
 
-  void printControlMap(TeamColors team) const;
+  void printControlSpaces(TeamColors team) const;
+
+  void printTeamControlMap(TeamColors team) const;
 
   void printSpecialPieces() const;
 
