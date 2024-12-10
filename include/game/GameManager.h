@@ -4,6 +4,7 @@
 #include "CommonHeaders.h"
 #include "Board.h"
 #include "JumpType.h"
+#include "FENManager.h"
 
 class Board;
 
@@ -20,17 +21,15 @@ class GameManager {
   std::map<int, int> whiteControlledSpaces;
   std::map<int, int> blackControlledSpaces;
   
-  // Quick lookups for pieces and the spaces each piece controls
+  // Quick lookups for pieces and the spaces each piece controls (can also merge maybe)
   //   key   -> Chess piece
   //   value -> Squares controlled by specific piece
-  std::map<ChessPiece*, std::unordered_set<int>> whitePieceControlMap;
-  std::map<ChessPiece*, std::unordered_set<int>> blackPieceControlMap;
+  std::map<ChessPiece*, std::unordered_set<int>> pieceControlMap;
 
-  // Map to store piece locations
+  // Map to store piece locations (May want to merge)
   //   key   -> index
   //   value -> Chess piece
-  std::map<int, ChessPiece*> whitePieceMap;
-  std::map<int, ChessPiece*> blackPieceMap;
+  std::map<int, ChessPiece*> pieceMap;
   
   // Individually track pieces that can jump other pieces (ie. Knight)
   //   key   -> Chess piece
@@ -42,8 +41,6 @@ class GameManager {
   void intializeMemberVariables();
 
   bool isPiecePinnedToKing(int kingIndex, int pieceIndex);
-
-  bool isValidFEN(std::string &fenString);
   
   // Meant for debugging data structures, will get deleted on final build
   void printPieceMap(TeamColors team) const;
@@ -52,12 +49,12 @@ class GameManager {
 
   void printTeamControlMap(TeamColors team) const;
 
-  void printSpecialPieces() const;
+  void printJumpers() const;
 
 public:
   GameManager();
 
-  GameManager(std::string fenString);
+  GameManager(FENManager fen);
 
   ~GameManager();
 

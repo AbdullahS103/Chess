@@ -6,25 +6,51 @@
 // Class used to validate FEN and deconstruct FEN string
 class FENManager {
 
+  std::string layout;
+
+  char turn;
+
+  std::string castlingRights;
+
+  std::string enpassantRights;
+
+  int halfmoves;
+
+  int fullmoves;
+
   static std::vector<std::string> split(std::string str, char delimiter);
 
-  static bool isValidLayout(std::string layout);
+  bool isValidLayout(std::string layout);
 
-  static bool isValidTurn(std::string turn);
+  bool isValidTurn(std::string turn);
 
-  static bool isValidCastlingState(std::string castling);
+  bool isValidCastlingRights(std::string castling, std::string layout);
 
-  static bool isValidEnpassantState(std::string enpassant);
+  bool isValidEnpassantRights(std::string enpassant);
 
-  static bool isValidHalfMoves(std::string halfmoves);
+  bool isValidHalfMoves(std::string halfmoves);
 
-  static bool isValidFullMoves(std::string fullmoves);
+  bool isValidFullMoves(std::string fullmoves);
+
+  bool isValidFEN(std::string &fenString);
 
 public:
 
-  static bool isValidFEN(std::string &fenString);
+  FENManager(std::string fenString);
 
-  static std::string getBoardLayout(std::string &fenString);
+  ~FENManager();
+
+  std::string getLayout();
+
+  char getTurn();
+
+  std::string getCastlingRights();
+
+  std::string getEnpassantRights();
+
+  int getHalfMoves();
+
+  int getFullMoves();
 };
 
 #endif
