@@ -7,7 +7,7 @@ ChessPiece::ChessPiece(TeamColors color, std::string symbol) {
 }
 
 std::ostream &operator<<(std::ostream &strm, const ChessPiece &piece) { 
-  return strm << piece.getSymbol() << std::endl; 
+  return strm << piece.getSymbol(); 
 };
 
 bool ChessPiece::isSameTeam(ChessPiece *piece) { 
