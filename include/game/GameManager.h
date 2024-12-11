@@ -11,30 +11,37 @@ class Board;
 // GameManager class handles getting information on Board state, chess moves, player strength calculations, etc.
 class GameManager {
   Board *board;
-  Board *emptyBoard;
   int whiteKingIndex;
   int blackKingIndex;
 
   // Tracks the squares that are controlled by a team
   //   key   -> Square Index
   //   value -> Number of pieces that control that square (frequency)
-  std::map<int, int> whiteControlledSpaces;
-  std::map<int, int> blackControlledSpaces;
+  std::map<int, std::unordered_set<ChessPiece*>> whiteControlledSpaces;
+
+  // Tracks the squares that are controlled by a team
+  //   key   -> Square Index
+  //   value -> Number of pieces that control that square (frequency)
+  std::map<int, std::unordered_set<ChessPiece*>> blackControlledSpaces;
   
-  // Quick lookups for pieces and the spaces each piece controls (can also merge maybe)
+  // Quick lookups for pieces and the spaces each piece controls
   //   key   -> Chess piece
   //   value -> Squares controlled by specific piece
   std::map<ChessPiece*, std::unordered_set<int>> pieceControlMap;
 
-  // Map to store piece locations (May want to merge)
+  // Map to store piece locations
   //   key   -> index
   //   value -> Chess piece
   std::map<int, ChessPiece*> pieceMap;
-  
-  // Individually track pieces that can jump other pieces (ie. Knight)
+
+  // Reverse of piece map
   //   key   -> Chess piece
   //   value -> index
-  std::map<ChessPiece*, int> jumpers;
+  std::map<ChessPiece*, int> reversePieceMap;
+  
+  // Individually track pieces that can jump other pieces (ie. Knight)
+  //   key -> Chess piece
+  std::unordered_set<ChessPiece*> jumpers;
 
   int getKingIndex(TeamColors team);
 
@@ -42,6 +49,16 @@ class GameManager {
 
   bool isPiecePinnedToKing(int kingIndex, int pieceIndex);
   
+  bool evaluateCheckmateByJump(ChessPiece* threat);
+
+  bool evaluateCheckmateByLineOfSight(ChessPiece* threat);
+
+  void executePromotionRules(ChessPiece *pawn, int toRow, int toCol);
+
+  void executeEnpassantRules(ChessPiece *pawn, int toRow, int toCol);
+
+  void executeCastlingRules(ChessPiece *king, int toRow, int toCol);
+
   // Meant for debugging data structures, will get deleted on final build
   void printPieceMap(TeamColors team) const;
 
@@ -58,7 +75,8 @@ public:
 
   ~GameManager();
 
-  // void movePiece(int fromRow, int fromCol, int toRow, int toCol);
+  void movePiece(int fromRow, int fromCol, int toRow, int toCol);
+
   // int getBlackStrength() const;
   // int getWhiteStrength() const;
   bool inCheck(TeamColors team);

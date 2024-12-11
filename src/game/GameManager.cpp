@@ -1,29 +1,26 @@
 #include "GameManager.h"
 #include "BoardStateGenerator.h"
-#include "King.h"
 #include "Errors.h"
+
+#include "King.h"
+#include "Pawn.h"
 
 GameManager::GameManager() {
   this->board = new Board();
-  this->emptyBoard = new Board();
   BoardStateGenerator::standardBoard(*this->board);
   intializeMemberVariables();
 }
 
 GameManager::GameManager(FENManager fen) {
   this->board = new Board();
-  this->emptyBoard = new Board();
 
   // Initialize the board based on FEN
   BoardStateGenerator::FENBoard(*this->board, fen.getLayout());
-  
-  // Iterate through board to initialize variables to correctly track board state
   intializeMemberVariables();
 }
 
 GameManager::~GameManager() {
   delete board;
-  delete emptyBoard;
 }
 
 int GameManager::getKingIndex(TeamColors team) {
@@ -44,11 +41,8 @@ void GameManager::intializeMemberVariables() {
   this->whiteKingIndex = getKingIndex(TeamColors::WHITE);
   this->blackKingIndex = getKingIndex(TeamColors::BLACK);
 
-  for (int i = 0; i < board->getBoardSize(); i++) {
-    whiteControlledSpaces[i] = 0;
-    blackControlledSpaces[i] = 0;
+  for (int i = 0; i < board->getBoardSize(); i++) 
     pieceMap[i] = nullptr;
-  }
 
   for (int i = 0; i < board->getBoardSize(); i++) {
     ChessPiece *piece = board->getPiece(i);
@@ -62,125 +56,110 @@ void GameManager::intializeMemberVariables() {
 
     // Populate data structures with piece location and piece control squares
     pieceMap[i] = piece;
+    reversePieceMap[piece] = i;
     pieceControlMap[piece] = controlSquares;
       
     for (const int index : controlSquares) {
       if (color == TeamColors::WHITE)
-        whiteControlledSpaces[index]++;
+        whiteControlledSpaces[index].insert(piece);
       else
-        blackControlledSpaces[index]++;
+        blackControlledSpaces[index].insert(piece);
     }
 
     // Track pieces that can jump seperatly
     JumpType* specialPiece = dynamic_cast<JumpType*>(piece);
     if (specialPiece) 
-      jumpers[piece] = i;
+      jumpers.insert(piece);
   }
 }
 
 bool GameManager::inCheck(TeamColors team) {
   if (team == TeamColors::WHITE)
-    return this->blackControlledSpaces[whiteKingIndex] > 0;
+    return this->blackControlledSpaces[whiteKingIndex].size() > 0;
   else 
-    return this->whiteControlledSpaces[blackKingIndex] > 0;
+    return this->whiteControlledSpaces[blackKingIndex].size() > 0;
 }
 
 bool GameManager::inCheckmate(TeamColors team) {
-  std::cout << *board << std::endl;
   if (!inCheck(team))
     return false;
 
   int kingIndex = (team == TeamColors::WHITE ? whiteKingIndex : blackKingIndex);
   ChessPiece *king = pieceMap[kingIndex];
-  std::map<int, int> enemyControlledSpaces = (team == TeamColors::WHITE ? blackControlledSpaces : whiteControlledSpaces);
+  std::map<int, std::unordered_set<ChessPiece*>> enemyControlledSpaces = 
+      (team == TeamColors::WHITE ? blackControlledSpaces : whiteControlledSpaces);
 
   // Check if king can move anywhere that is safe
   for (const int index : pieceControlMap[king]) {
     ChessPiece *piece = board->getPiece(index);
     if (piece && piece->isSameTeam(team))
       continue;
-    if (enemyControlledSpaces[index] == 0)
+    if (enemyControlledSpaces[index].size() == 0)
       return false;
   }
 
   // If there are multiple threats found at this point, king is in checkmate,
   // since king has no where to move that is safe, and you cant block two threats in one move
-  if (enemyControlledSpaces[kingIndex] > 1)
+  if (enemyControlledSpaces[kingIndex].size() > 1)
     return true;
   
-  // Checks for threats from pieces that can jump other pieces
-  ChessPiece *jumpThreat = nullptr;
-  int jumpThreatIndex = -1;
-  for (auto it = jumpers.begin(); it != jumpers.end(); it++) {
-    if (it->first->isSameTeam(team))
-      continue;
-    // Logic to figure out if jump piece threatens king
-    if (pieceControlMap[it->first].count(kingIndex) > 0) {
-      jumpThreat = it->first;
-      jumpThreatIndex=it->second;
-    }
-  }
+  ChessPiece* kingThreat = *enemyControlledSpaces[kingIndex].begin();
+  if (jumpers.count(kingThreat) > 0)
+    return evaluateCheckmateByJump(kingThreat);
+  
+  return evaluateCheckmateByLineOfSight(kingThreat);
+}
 
+bool GameManager::evaluateCheckmateByJump(ChessPiece* threat) {
+  int kingIndex = (threat->getColor() == TeamColors::WHITE ? blackKingIndex : whiteKingIndex);
+  int threatIndex = reversePieceMap[threat];
+  std::unordered_set<ChessPiece*> potentialAllies = 
+      (threat->getColor() == TeamColors::WHITE ? blackControlledSpaces[threatIndex] : whiteControlledSpaces[threatIndex]);
+  
   // If player can capture the jump threat with a piece not pinned to king, king is not in checkmate
-  if (jumpThreat) {
-    for (auto it = pieceControlMap.begin(); it != pieceControlMap.end(); it++) {
-      if (it->first->getColor() != king->getColor())
-        continue;
-      if (it->second.count(jumpThreatIndex) > 0 && !isPiecePinnedToKing(kingIndex, jumpThreatIndex))
-        return false; 
-    }
-    return true;
-  }
+  for (ChessPiece *piece : potentialAllies) 
+    if (!isPiecePinnedToKing(kingIndex, threatIndex))
+      return false; 
+  return true;
+}
 
-  // Iterate through all 8 directions king threat can exist (line of sight threat)
-  int rowOffset[] = {1, 1, -1, -1, 1, -1, 0, 0};
-  int colOffset[] = {1, -1, 1, -1, 0, 0, 1, -1};
-  int directionalThreatDirection = -1;
-  int directionalThreatIndex = -1;
+bool GameManager::evaluateCheckmateByLineOfSight(ChessPiece* threat) {
+  int kingIndex = (threat->getColor() == TeamColors::WHITE ? blackKingIndex : whiteKingIndex);
+  int threatIndex = reversePieceMap[threat];
+
   int row = board->getRow(kingIndex);
   int col = board->getColumn(kingIndex);
+  int pieceRow = board->getRow(threatIndex);
+  int pieceCol = board->getColumn(threatIndex);
 
-  for (int i = 0; i < 8; i++) {
-    int newRow = row + rowOffset[i];
-    int newCol = col + colOffset[i];
+  int rowUnitNorm = pieceRow - row; 
+  int colUnitNorm = pieceCol - col;
+  if (rowUnitNorm != 0)
+    rowUnitNorm /= abs(rowUnitNorm);
+  if (colUnitNorm != 0)
+    colUnitNorm /= abs(colUnitNorm);
 
-    while (board->isOnBoard(newRow, newCol)) { 
-      ChessPiece *currentPiece = board->getPiece(newRow, newCol);
-      // If nullptr, no piece is here, continue search
-      if (!currentPiece) {
-        newRow += rowOffset[i];
-        newCol += colOffset[i];
-        continue;
-      }
-      // Check if found piece threatens capture of the king
-      if (!currentPiece->isValidMove(*board, newRow, newCol, row, col)) 
-        break;
-      directionalThreatDirection = i;
-      directionalThreatIndex = board->getIndex(newRow, newCol);
-      break;
-    }
-  }
+  row += rowUnitNorm;
+  col += colUnitNorm;
+  int index = board->getIndex(row, col);
+  std::map<int, std::unordered_set<ChessPiece*>> potentialAllies = 
+      (threat->getColor() == TeamColors::WHITE ? blackControlledSpaces : whiteControlledSpaces);
 
   // Check if player can either capture piece threatening capture of king or block it
-  row += rowOffset[directionalThreatDirection];
-  col += colOffset[directionalThreatDirection];
-  int index = board->getIndex(row, col);
-  while (index != directionalThreatIndex) {
-    for (auto it = pieceControlMap.begin(); it != pieceControlMap.end(); it++) {
-      // Skip king and pieces of opposite team, cannot be used to capture/block threat
-      // (King has already been proven to be stuck and unable to move at this point)
-      if (*it->first == *king || it->first->getColor() != king->getColor())
-        continue;
-      if (it->second.count(index) > 0 && !isPiecePinnedToKing(kingIndex, index))
+  while (board->isOnBoard(row, col)) {
+    // See if piece can move to that position, either blocking line of sight or capturing threat
+    // Exclude king, since it has already checked that king cannot move to a safe location
+    for (ChessPiece* piece : potentialAllies[index]) 
+      if (piece != pieceMap[kingIndex] && !isPiecePinnedToKing(kingIndex, index))
         return false;
-    }
-    // If a piece is found, it is guarenteed to be enemy piece giving check
-    // At this point, it is concluded player cannot capture said piece or block it, can 
-    // break out of loop
+    
+    // If a piece is found, it is guarenteed to be enemy piece giving check, which was found to 
+    // be uncapturable due to pin, can break loop early
     if (board->getPiece(board->getIndex(row, col)))
       break;
-    row += rowOffset[directionalThreatDirection];
-    col += colOffset[directionalThreatDirection];
+
+    row += rowUnitNorm;
+    col += colUnitNorm;
     index = board->getIndex(row, col);
   }
   return true;
@@ -192,42 +171,76 @@ bool GameManager::isPiecePinnedToKing(int kingIndex, int pieceIndex) {
   int pieceRow = board->getRow(pieceIndex);
   int pieceCol = board->getColumn(pieceIndex);
 
-  int rowDiff = abs(kingRow - pieceRow);
-  int colDiff = abs(kingCol - pieceCol);
-
-  // Move is not horizontal, vertical, or diagonal
-  if ((kingRow != pieceRow && kingCol != pieceCol) && (rowDiff != colDiff || rowDiff == 0))
-    return false;
-
-  int rowUnitNorm = pieceRow - kingRow; 
-  int colUnitNorm = pieceCol - kingCol;
-  if (rowDiff > 0)
-    rowUnitNorm /= rowDiff;
-  if (colDiff > 0)
-    colUnitNorm /= colDiff;
-
-  // Search past the piece, relative to its direction from the king
-  int newRow = pieceRow + rowUnitNorm;
-  int newCol = pieceCol + colUnitNorm;
-  while (board->isOnBoard(newRow, newCol)) {
-    ChessPiece *piece = board->getPiece(newRow, newCol);
-    if (piece) 
-      return piece->isValidMove(*emptyBoard, newRow, newCol, kingRow, kingCol);
-    newRow += rowUnitNorm;
-    newCol += colUnitNorm;   
+  ChessPiece* piece = pieceMap[pieceIndex];
+  bool isPinned = false;
+  std::unordered_set<ChessPiece*> attackers = 
+      (piece->getColor() == TeamColors::WHITE ? blackControlledSpaces[pieceIndex] : whiteControlledSpaces[pieceIndex]);
+  
+  board->setPiece(pieceRow, pieceCol, nullptr);
+  for (ChessPiece* piece : attackers) {
+    int attackerRow = board->getRow(reversePieceMap[piece]);
+    int attackerCol = board->getColumn(reversePieceMap[piece]);
+    isPinned = piece->isValidMove(*board, attackerRow, attackerCol, kingRow, kingCol);
+    if (isPinned)
+      break;
   }
-  return false;
+
+  board->setPiece(pieceRow, pieceCol, piece);
+  return isPinned;
+}
+
+void GameManager::movePiece(int fromRow, int fromCol, int toRow, int toCol) {
+  // Initial checks to validate move 
+  ChessPiece *fromPiece = board->getPiece(fromRow, fromCol);
+  if (fromPiece == nullptr)
+    throw InvalidMoveException("ERROR: No piece at selected position");
+
+  ChessPiece *toPiece = board->getPiece(toRow, toCol);
+  if (fromPiece->isSameTeam(toPiece))
+    throw InvalidMoveException("ERROR: Move intersects with another piece from the same team!");
+
+  // Check if move is allowed to be made
+  if (!fromPiece->isValidMove(*board, fromRow, fromCol, toRow, toCol)) {
+    if (typeid(fromPiece) == typeid(Pawn) && 
+      (fromPiece->getColor() == TeamColors::WHITE && toRow == 0) || 
+      (fromPiece->getColor() == TeamColors::BLACK && toRow == board->getRows() - 1))
+      return executePromotionRules(fromPiece, toRow, toCol);
+    else if (typeid(fromPiece) == typeid(Pawn))
+      return executeEnpassantRules(fromPiece, toRow, toCol);
+    else if (typeid(fromPiece) == typeid(King))
+      return executeCastlingRules(fromPiece, toRow, toCol);
+    else 
+      throw InvalidMoveException("ERROR: Invalid move");
+  }
+    
+  // check if King would be safe after move
+  TeamColors team = fromPiece->getColor();
+  int kingIndex = (team == TeamColors::WHITE ? whiteKingIndex : blackKingIndex);
+  int pieceIndex = board->getIndex(fromRow, fromCol);
+  bool isPinned = isPiecePinnedToKing(kingIndex, pieceIndex);
+  bool isCheck = inCheck(team);
+  if (isPinned && isCheck)
+    throw InvalidMoveException("ERROR: Piece is pinned and cannot be moved until check resolves.");
+    
+}
+
+void GameManager::executePromotionRules(ChessPiece *pawn, int toRow, int toCol) {
+
+}
+
+void GameManager::executeEnpassantRules(ChessPiece *pawn, int toRow, int toCol) {
+  
+}
+
+void GameManager::executeCastlingRules(ChessPiece *king, int toRow, int toCol) {
+  
 }
 
 void GameManager::printJumpers() const {
   std::ostringstream oss; // String stream to build the string
   oss << "[";
-  for (auto it = jumpers.begin(); it != jumpers.end(); ++it)  {
-    oss << it->first->getSymbol() << " : " << std::to_string(it->second);
-    if (std::next(it) != jumpers.end()) { 
-      oss << " , ";
-    }
-  }
+  for (ChessPiece* piece : jumpers)  
+    oss << piece->getSymbol() << " , ";
   oss << " ]";
   std::cout << oss.str() << std::endl;
 }
@@ -239,23 +252,23 @@ void GameManager::printPieceMap(TeamColors team) const {
     if (team != it->second->getColor())
       continue;
     oss << std::to_string(it->first) << ": " << (it->second ? it->second->getSymbol() : "NULL");
-    if (std::next(it) != pieceMap.end()) { 
+    if (std::next(it) != pieceMap.end()) 
       oss << " , ";
-    }
   }
   oss << " }";
   std::cout << oss.str() << std::endl;
 }
 
 void GameManager::printControlSpaces(TeamColors team) const {
-  std::map<int, int> map = (team == TeamColors::WHITE ? whiteControlledSpaces : blackControlledSpaces);
+  std::map<int, std::unordered_set<ChessPiece*>> map = (team == TeamColors::WHITE ? whiteControlledSpaces : blackControlledSpaces);
   std::ostringstream oss;
-  oss << "{";
+  oss << "{\n";
   for (auto it = map.begin(); it != map.end(); ++it) {
-    oss << std::to_string(it->first) << ": " << std::to_string(it->second);
-    if (std::next(it) != map.end()) { // Add a comma between key-value pairs, but not after the last one
-      oss << ", ";
+    oss << std::to_string(it->first) << ":";
+    for (ChessPiece* piece : it->second) {
+      oss << " " << piece << " , ";
     }
+    oss << std::endl;
   }
   oss << "}";
   std::cout << oss.str() << std::endl;
