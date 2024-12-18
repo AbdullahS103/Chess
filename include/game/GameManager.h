@@ -47,6 +47,10 @@ class GameManager {
 
   void intializeMemberVariables();
 
+  void updateMemberVariables(ChessPiece *piece, int toRow, int toCol);
+
+  void updateControlSquares(ChessPiece *piece);
+
   bool isPiecePinnedToKing(int kingIndex, int pieceIndex);
   
   bool evaluateCheckmateByJump(ChessPiece* threat);
