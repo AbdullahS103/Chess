@@ -14,6 +14,9 @@ class GameManager {
   int whiteKingIndex;
   int blackKingIndex;
 
+  // Enpassant specific variables
+  ChessPiece* enpassantPiece;
+
   // Tracks the squares that are controlled by a team
   //   key   -> Square Index
   //   value -> Number of pieces that control that square (frequency)
@@ -61,6 +64,8 @@ class GameManager {
 
   void executeEnpassantRules(ChessPiece *pawn, int toRow, int toCol);
 
+  void executeEnpassantMovement(ChessPiece *pawn, int toRow, int toCol);
+
   void executeCastlingRules(ChessPiece *king, int toRow, int toCol);
 
   // Meant for debugging data structures, will get deleted on final build
@@ -86,6 +91,8 @@ public:
   bool inCheck(TeamColors team);
 
   bool inCheckmate(TeamColors team);
+
+  friend std::ostream &operator<<(std::ostream &strm, const GameManager &game);
 };
 
 #endif

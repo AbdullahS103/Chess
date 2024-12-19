@@ -191,6 +191,9 @@ bool GameManager::isPiecePinnedToKing(int kingIndex, int pieceIndex) {
 
 void GameManager::movePiece(int fromRow, int fromCol, int toRow, int toCol) {
   // Initial checks to validate move 
+  if (!board->isOnBoard(fromRow, fromCol) || !board->isOnBoard(toRow, toCol))
+    throw InvalidMoveException("ERROR: Move is outside board");
+  
   ChessPiece *fromPiece = board->getPiece(fromRow, fromCol);
   if (fromPiece == nullptr)
     throw InvalidMoveException("ERROR: No piece at selected position");
@@ -199,25 +202,19 @@ void GameManager::movePiece(int fromRow, int fromCol, int toRow, int toCol) {
   if (fromPiece->isSameTeam(toPiece))
     throw InvalidMoveException("ERROR: Move intersects with another piece from the same team!");
 
-  // Edge case enabled by the world of chess - promotion of a pawn
-  if (typeid(fromPiece) == typeid(Pawn) && 
-     (fromPiece->getColor() == TeamColors::WHITE && toRow == 0) || 
-     (fromPiece->getColor() == TeamColors::BLACK && toRow == board->getRows() - 1))
-    return executePromotionRules(fromPiece, toRow, toCol);
-
   // Check additional edge cases if move is not valid before throwing error
   // These include enpassant and castling
   if (!fromPiece->isValidMove(*board, fromRow, fromCol, toRow, toCol)) {
-    if (typeid(fromPiece) == typeid(Pawn))
+    if (typeid(*fromPiece) == typeid(Pawn))
       return executeEnpassantRules(fromPiece, toRow, toCol);
-    if (typeid(fromPiece) == typeid(King))
+    if (typeid(*fromPiece) == typeid(King))
       return executeCastlingRules(fromPiece, toRow, toCol);
     throw InvalidMoveException("ERROR: Invalid move");
   }
   
   // Check if king is safe after move
   TeamColors team = fromPiece->getColor();
-  std::map<int, std::unordered_set<ChessPiece*>> enemyControlMap = (team == TeamColors::WHITE) ? whiteControlledSpaces : blackControlledSpaces;
+  std::map<int, std::unordered_set<ChessPiece*>> enemyControlMap = (team == TeamColors::WHITE) ? blackControlledSpaces : whiteControlledSpaces;
 
   int fromPieceIndex = board->getIndex(fromRow, fromCol);
   int kingIndex = (team == TeamColors::WHITE ? whiteKingIndex : blackKingIndex);
@@ -253,6 +250,12 @@ void GameManager::movePiece(int fromRow, int fromCol, int toRow, int toCol) {
   // at this point move has been confirmed to be valid, so delete the last piece and update data structures
   delete toPiece;
   updateMemberVariables(fromPiece, toRow, toCol);  
+
+  // Edge case enabled by the world of chess - promotion of a pawn
+  if (typeid(*fromPiece) == typeid(Pawn) && 
+     (fromPiece->getColor() == TeamColors::WHITE && toRow == 0) || 
+     (fromPiece->getColor() == TeamColors::BLACK && toRow == board->getRows() - 1))
+    executePromotionRules(fromPiece, toRow, toCol);
 }
 
 void GameManager::executePromotionRules(ChessPiece *pawn, int toRow, int toCol) {
@@ -260,7 +263,157 @@ void GameManager::executePromotionRules(ChessPiece *pawn, int toRow, int toCol) 
 }
 
 void GameManager::executeEnpassantRules(ChessPiece *pawn, int toRow, int toCol) {
+  TeamColors team = pawn->getColor();
+  int fromRow = board->getRow(reversePieceMap[pawn]);
+  int fromCol = board->getColumn(reversePieceMap[pawn]);
   
+  // If pawn is moving up two spaces, execute a different function to set up enpassant opportunity
+  if (abs(fromRow - toRow) == 2 && toCol == fromCol)
+    return executeEnpassantMovement(pawn, toRow, toCol);
+  
+  // Get the piece that would be captured via enpassant
+  int pieceRow = (team == TeamColors::WHITE) ? toRow - 1 : toRow + 1;
+  ChessPiece *enpassantTarget = board->getPiece(pieceRow, toCol);
+  int enpassantTargetRow = board->getRow(reversePieceMap[enpassantTarget]);
+  int enpassantTargetCol = board->getColumn(reversePieceMap[enpassantTarget]);
+
+  if (enpassantTarget != enpassantPiece)
+    throw InvalidMoveException("ERROR: Chess piece can not be captured via enpassant");
+  if ((abs(fromCol - toCol) > 1 || abs(fromRow - toRow) != 1) ||
+      (team == TeamColors::WHITE && fromRow < toRow) ||
+      (team == TeamColors::BLACK && fromRow > toRow))
+    throw InvalidMoveException("ERROR: Invalid pawn move");
+ 
+  // Check if king is safe after move
+  std::map<int, std::unordered_set<ChessPiece*>> enemyControlMap = (team == TeamColors::WHITE) ? blackControlledSpaces : whiteControlledSpaces;
+
+  int fromIndex = board->getIndex(fromRow, fromCol);
+  int kingIndex = (team == TeamColors::WHITE ? whiteKingIndex : blackKingIndex);
+  int kingRow = board->getRow(kingIndex);
+  int kingCol = board->getColumn(kingIndex);
+  
+  bool isPinned = isPiecePinnedToKing(kingIndex, fromIndex);
+  bool isCheck = inCheck(team);
+  if (isPinned && isCheck)
+    throw InvalidMoveException("ERROR: Piece is pinned and cannot be moved until check resolves.");
+  
+  // temporarily make the move
+  board->setPiece(toRow, toCol, pawn);
+  board->setPiece(fromRow, fromCol, nullptr);
+  board->setPiece(enpassantTargetRow, enpassantTargetCol, nullptr);
+
+  // Ensure king is safe after move
+  if (isCheck || isPinned) {
+    int index = isCheck ? kingIndex : fromIndex;
+    for (ChessPiece* attacker : enemyControlMap[index]) {
+      int attackerRow = board->getRow(reversePieceMap[attacker]);
+      int attackerCol = board->getColumn(reversePieceMap[attacker]);
+      if (attacker->isValidMove(*board, attackerRow, attackerCol, kingRow, kingCol)) {
+        board->setPiece(toRow, toCol, nullptr);
+        board->setPiece(fromRow, fromCol, pawn);
+        board->setPiece(enpassantTargetRow, enpassantTargetCol, enpassantTarget);
+        throw InvalidMoveException("ERROR: Move allows opponent to capture king on next turn.");
+      }
+    }
+  }
+
+  // at this point move has been confirmed to be valid, so delete the last piece and update data structures
+  delete enpassantTarget;
+
+  int enpassantTargetIndex = reversePieceMap[enpassantTarget];
+  int toIndex = board->getIndex(toRow, toCol);
+
+  // Update data structures that track piece location
+  reversePieceMap.erase(pieceMap[enpassantTargetIndex]);
+  reversePieceMap[pawn] = toIndex;
+
+  pieceMap[enpassantTargetIndex] = nullptr;
+  pieceMap[fromIndex] = nullptr;
+  pieceMap[toIndex] = pawn;
+
+  // update data structrues that track piece control
+  // this includes the original piece that moved AND 
+  // all pieces that were looking at where that piece was and where it is now
+  updateControlSquares(pawn);
+  for (ChessPiece *piece : whiteControlledSpaces[fromIndex]) 
+    updateControlSquares(piece);
+  for (ChessPiece *piece : blackControlledSpaces[fromIndex])
+    updateControlSquares(piece);
+  for (ChessPiece *piece : whiteControlledSpaces[toIndex])
+    updateControlSquares(piece);
+  for (ChessPiece *piece : blackControlledSpaces[toIndex])
+    updateControlSquares(piece);
+  for (ChessPiece *piece : whiteControlledSpaces[enpassantTargetIndex])
+    updateControlSquares(piece);
+  for (ChessPiece *piece : blackControlledSpaces[enpassantTargetIndex])
+    updateControlSquares(piece);
+  
+  enpassantPiece = nullptr;
+}
+
+void GameManager::executeEnpassantMovement(ChessPiece *pawn, int toRow, int toCol) {
+  TeamColors team = pawn->getColor();
+  int fromRow = board->getRow(reversePieceMap[pawn]);
+  int fromCol = board->getColumn(reversePieceMap[pawn]);
+
+  if ((team == TeamColors::WHITE && fromRow != board->getRows() - 2) || (team == TeamColors::BLACK && fromRow != 1)) 
+    throw InvalidMoveException("ERROR: Pawn cannot move two spaces");
+  if (!board->getPiece(toRow, toCol) || !board->getPiece((fromRow + toRow) / 2, toCol))
+    throw InvalidMoveException("ERROR: Piece blocks forward movement of pawn");
+
+  // Check if king is safe after move
+  std::map<int, std::unordered_set<ChessPiece*>> enemyControlMap = (team == TeamColors::WHITE) ? blackControlledSpaces : whiteControlledSpaces;
+
+  int fromIndex = board->getIndex(fromRow, fromCol);
+  int kingIndex = (team == TeamColors::WHITE ? whiteKingIndex : blackKingIndex);
+  int kingRow = board->getRow(kingIndex);
+  int kingCol = board->getColumn(kingIndex);
+  
+  bool isPinned = isPiecePinnedToKing(kingIndex, fromIndex);
+  bool isCheck = inCheck(team);
+  if (isPinned && isCheck)
+    throw InvalidMoveException("ERROR: Piece is pinned and cannot be moved until check resolves.");
+  
+  // temporarily make the move
+  board->setPiece(toRow, toCol, pawn);
+  board->setPiece(fromRow, fromCol, nullptr);
+
+  // Ensure king is safe after move
+  if (isCheck || isPinned) {
+    int index = isCheck ? kingIndex : fromIndex;
+    for (ChessPiece* attacker : enemyControlMap[index]) {
+      int attackerRow = board->getRow(reversePieceMap[attacker]);
+      int attackerCol = board->getColumn(reversePieceMap[attacker]);
+      if (attacker->isValidMove(*board, attackerRow, attackerCol, kingRow, kingCol)) {
+        board->setPiece(toRow, toCol, nullptr);
+        board->setPiece(fromRow, fromCol, pawn);
+        throw InvalidMoveException("ERROR: Move allows opponent to capture king on next turn.");
+      }
+    }
+  }
+
+  int toIndex = board->getIndex(toRow, toCol);
+
+  // Update data structures that track piece location
+  reversePieceMap[pawn] = toIndex;
+
+  pieceMap[fromIndex] = nullptr;
+  pieceMap[toIndex] = pawn;
+
+  // update data structrues that track piece control
+  // this includes the original piece that moved AND 
+  // all pieces that were looking at where that piece was and where it is now
+  updateControlSquares(pawn);
+  for (ChessPiece *piece : whiteControlledSpaces[fromIndex]) 
+    updateControlSquares(piece);
+  for (ChessPiece *piece : blackControlledSpaces[fromIndex])
+    updateControlSquares(piece);
+  for (ChessPiece *piece : whiteControlledSpaces[toIndex])
+    updateControlSquares(piece);
+  for (ChessPiece *piece : blackControlledSpaces[toIndex])
+    updateControlSquares(piece);
+  
+  enpassantPiece = pawn;  
 }
 
 void GameManager::executeCastlingRules(ChessPiece *king, int toRow, int toCol) {
@@ -367,3 +520,7 @@ void GameManager::printTeamControlMap(TeamColors team) const {
   oss << "}";
   std::cout << oss.str() << std::endl;
 }
+
+std::ostream &operator<<(std::ostream &strm, const GameManager &game) {
+  return strm << game.board;
+};
