@@ -1,6 +1,6 @@
 #include "Rook.h"
 
-Rook::Rook(TeamColors color) : ChessPiece(color, (color == TeamColors::WHITE ? "♖" : "♜")){};
+Rook::Rook(TeamColors color) : ChessPiece(color, (color == TeamColors::WHITE ? "♖" : "♜"), "Rook", true){};
 
 bool Rook::isValidMove(Board &board, int fromRow, int fromCol, int toRow, int toCol) { 
   if (!board.isOnBoard(fromRow, fromCol) || !board.isOnBoard(toRow, toCol))

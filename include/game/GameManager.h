@@ -17,14 +17,16 @@ class GameManager {
   // Enpassant specific variables
   ChessPiece* enpassantPiece;
 
+  std::unordered_set<std::string> promotionTargets;
+
   // Tracks the squares that are controlled by a team
   //   key   -> Square Index
-  //   value -> Number of pieces that control that square (frequency)
+  //   value -> Pieces that control that square (white)
   std::map<int, std::unordered_set<ChessPiece*>> whiteControlledSpaces;
 
   // Tracks the squares that are controlled by a team
   //   key   -> Square Index
-  //   value -> Number of pieces that control that square (frequency)
+  //   value -> Pieces that control that square (black)
   std::map<int, std::unordered_set<ChessPiece*>> blackControlledSpaces;
   
   // Quick lookups for pieces and the spaces each piece controls

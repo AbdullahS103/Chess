@@ -1,6 +1,6 @@
 #include "Queen.h"
 
-Queen::Queen(TeamColors color) : ChessPiece(color, (color == TeamColors::WHITE ? "♕" : "♛")){};
+Queen::Queen(TeamColors color) : ChessPiece(color, (color == TeamColors::WHITE ? "♕" : "♛"), "Queen", true){};
 
 bool Queen::isValidMove(Board &board, int fromRow, int fromCol, int toRow, int toCol) { 
   if (!board.isOnBoard(fromRow, fromCol) || !board.isOnBoard(toRow, toCol))

@@ -10,8 +10,6 @@ class BoardStateGenerator {
 
   static const std::string STANDARD_CHESS_BOARD_FEN;
 
-  static ChessPiece* createPiece(char c);
-
 public:
 
   // Sets up a standard game of chess

@@ -1,6 +1,6 @@
 #include "Pawn.h"
 
-Pawn::Pawn(TeamColors color) : ChessPiece(color, (color == TeamColors::WHITE ? "♙" : "♟")){};
+Pawn::Pawn(TeamColors color) : ChessPiece(color, (color == TeamColors::WHITE ? "♙" : "♟"), "Pawn", false){};
 
 bool Pawn::isValidMove(Board &board, int fromRow, int fromCol, int toRow, int toCol) { 
   if (!board.isOnBoard(fromRow, fromCol) || !board.isOnBoard(toRow, toCol))

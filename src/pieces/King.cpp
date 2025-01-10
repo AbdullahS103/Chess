@@ -1,6 +1,6 @@
 #include "King.h"
 
-King::King(TeamColors color) : ChessPiece(color, (color == TeamColors::WHITE ? "♔" : "♚")){};
+King::King(TeamColors color) : ChessPiece(color, (color == TeamColors::WHITE ? "♔" : "♚"), "King", false){};
 
 bool King::isValidMove(Board &board, int fromRow, int fromCol, int toRow, int toCol) { 
   if (!board.isOnBoard(fromRow, fromCol) || !board.isOnBoard(toRow, toCol))

@@ -15,9 +15,13 @@ protected:
   
   std::string symbol;
 
+  std::string name;
+
+  bool isPromotable;
+
 public:
 
-  ChessPiece(TeamColors color, std::string symbol);
+  ChessPiece(TeamColors color, std::string symbol, std::string name, bool isPromotable);
 
   virtual ~ChessPiece() = default;
 

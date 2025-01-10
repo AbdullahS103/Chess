@@ -4,6 +4,7 @@
 
 #include "King.h"
 #include "Pawn.h"
+#include "PieceGenerator.h"
 
 GameManager::GameManager() {
   this->board = new Board();
@@ -40,6 +41,7 @@ int GameManager::getKingIndex(TeamColors team) {
 void GameManager::intializeMemberVariables() {
   this->whiteKingIndex = getKingIndex(TeamColors::WHITE);
   this->blackKingIndex = getKingIndex(TeamColors::BLACK);
+  promotionTargets = {"Rook", "Knight", "Bishop", "Queen"};
 
   for (int i = 0; i < board->getBoardSize(); i++) 
     pieceMap[i] = nullptr;
@@ -247,9 +249,10 @@ void GameManager::movePiece(int fromRow, int fromCol, int toRow, int toCol) {
     }
   }
 
-  // at this point move has been confirmed to be valid, so delete the last piece and update data structures
+  // at this point move has been confirmed to be valid, so delete the last piece and update data structures and update game state variables
   delete toPiece;
   updateMemberVariables(fromPiece, toRow, toCol);  
+  enpassantPiece = nullptr;
 
   // Edge case enabled by the world of chess - promotion of a pawn
   if (typeid(*fromPiece) == typeid(Pawn) && 
@@ -258,8 +261,45 @@ void GameManager::movePiece(int fromRow, int fromCol, int toRow, int toCol) {
     executePromotionRules(fromPiece, toRow, toCol);
 }
 
-void GameManager::executePromotionRules(ChessPiece *pawn, int toRow, int toCol) {
+void GameManager::executePromotionRules(ChessPiece *pawn, int row, int col) {
+  std::cout << "Detected pawn promotion event. Promotion targets are listed below : \n";
+  for (std::string target : promotionTargets) 
+    std::cout << "  - " << target << "\n";
+  std::cout << "To select target, enter target name (case sensitive) : ";
+  
+  std::string input;
+  std::cin >> input;
+  while (promotionTargets.find(input) == promotionTargets.end()) {
+    std::cout << "Target " << input << " is not a valid promotion target. Please re-enter target name : ";
+    std::cin >> input;
+  }
 
+  ChessPiece *promotionPiece = PieceGenerator::createPieceByName(input, pawn->getColor());
+  while (!promotionPiece) {
+    promotionTargets.erase(input);
+    std::cout << "Target " << input << " is currently not supported. Updated promotion targets are listed below : \n";
+    for (std::string target : promotionTargets) 
+      std::cout << "  - " << target << "\n";
+    std::cout << "To select target, enter target name (case sensitive) : ";
+    std::cin >> input;
+    
+    while (promotionTargets.find(input) == promotionTargets.end()) {
+      std::cout << "Target " << input << " is not a valid promotion target. Please re-enter target name : ";
+      std::cin >> input;
+    }
+
+    ChessPiece *promotionPiece = PieceGenerator::createPieceByName(input, pawn->getColor());
+  }
+
+  delete pawn;
+  int index = board->getIndex(row, col);
+  board->setPiece(row, col, promotionPiece);
+
+  pieceControlMap.erase(pawn);
+  pieceMap[index] = promotionPiece;
+  reversePieceMap.erase(pawn);
+  reversePieceMap[promotionPiece] = index;
+  updateControlSquares(promotionPiece);
 }
 
 void GameManager::executeEnpassantRules(ChessPiece *pawn, int toRow, int toCol) {

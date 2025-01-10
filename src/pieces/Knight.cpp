@@ -1,6 +1,6 @@
 #include "Knight.h"
 
-Knight::Knight(TeamColors color) : ChessPiece(color, (color == TeamColors::WHITE ? "♘" : "♞")){};
+Knight::Knight(TeamColors color) : ChessPiece(color, (color == TeamColors::WHITE ? "♘" : "♞"), "Knight", true){};
 
 bool Knight::isValidMove(Board &board, int fromRow, int fromCol, int toRow, int toCol) { 
   if (!board.isOnBoard(fromRow, fromCol) || !board.isOnBoard(toRow, toCol))
