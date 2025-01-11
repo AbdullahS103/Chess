@@ -17,6 +17,16 @@ class GameManager {
   // Enpassant specific variables
   ChessPiece* enpassantPiece;
 
+  // Castling specific variables
+  bool whiteQueenSideCastling;
+  bool whiteKingSideCastling;
+  bool blackQueenSideCastling;
+  bool blackKingSideCastling;
+  ChessPiece* blackQueenSideRook;
+  ChessPiece* blackKingSideRook;
+  ChessPiece* whiteQueenSideRook;
+  ChessPiece* whiteKingSideRook;
+
   std::unordered_set<std::string> promotionTargets;
 
   // Tracks the squares that are controlled by a team
@@ -69,6 +79,8 @@ class GameManager {
   void executeEnpassantMovement(ChessPiece *pawn, int toRow, int toCol);
 
   void executeCastlingRules(ChessPiece *king, int toRow, int toCol);
+
+  void disableKingCastling(TeamColors color);
 
   // Meant for debugging data structures, will get deleted on final build
   void printPieceMap(TeamColors team) const;

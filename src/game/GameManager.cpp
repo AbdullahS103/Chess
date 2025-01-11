@@ -4,12 +4,22 @@
 
 #include "King.h"
 #include "Pawn.h"
+#include "Rook.h"
 #include "PieceGenerator.h"
 
 GameManager::GameManager() {
   this->board = new Board();
   BoardStateGenerator::standardBoard(*this->board);
   intializeMemberVariables();
+
+  whiteQueenSideCastling = true;
+  whiteKingSideCastling = true;
+  blackQueenSideCastling = true;
+  blackKingSideCastling = true;
+  blackQueenSideRook = board->getPiece(0);
+  blackKingSideRook = board->getPiece(7);
+  whiteQueenSideRook = board->getPiece(56);
+  whiteKingSideRook = board->getPiece(63);
 }
 
 GameManager::GameManager(FENManager fen) {
@@ -249,16 +259,40 @@ void GameManager::movePiece(int fromRow, int fromCol, int toRow, int toCol) {
     }
   }
 
-  // at this point move has been confirmed to be valid, so delete the last piece and update data structures and update game state variables
+  // at this point move has been confirmed to be valid, so delete the last piece and update data structures
   delete toPiece;
   updateMemberVariables(fromPiece, toRow, toCol);  
+
+  // update game state variables
   enpassantPiece = nullptr;
+  if (typeid(*fromPiece) == typeid(King)) 
+    disableKingCastling(team);
+  if (typeid(*fromPiece) == typeid(Rook)) {
+    whiteKingSideRook = (whiteKingSideRook == fromPiece) ? nullptr : whiteKingSideRook;
+    whiteQueenSideRook = (whiteQueenSideRook == fromPiece) ? nullptr : whiteQueenSideRook;
+    blackQueenSideRook = (blackQueenSideRook == fromPiece) ? nullptr : blackQueenSideRook;
+    blackKingSideRook = (blackKingSideRook == fromPiece) ? nullptr : blackKingSideRook;
+  }
 
   // Edge case enabled by the world of chess - promotion of a pawn
   if (typeid(*fromPiece) == typeid(Pawn) && 
      (fromPiece->getColor() == TeamColors::WHITE && toRow == 0) || 
      (fromPiece->getColor() == TeamColors::BLACK && toRow == board->getRows() - 1))
     executePromotionRules(fromPiece, toRow, toCol);
+}
+
+void GameManager::disableKingCastling(TeamColors color) {
+  if (color == TeamColors::WHITE) {
+    whiteKingSideCastling = false;
+    whiteQueenSideCastling = false;
+    whiteKingSideRook = nullptr;
+    whiteQueenSideRook = nullptr;
+  } else {
+    blackKingSideCastling = false;
+    blackQueenSideCastling = false;
+    blackKingSideRook = nullptr;
+    blackQueenSideRook = nullptr;
+  }
 }
 
 void GameManager::executePromotionRules(ChessPiece *pawn, int row, int col) {
@@ -457,7 +491,63 @@ void GameManager::executeEnpassantMovement(ChessPiece *pawn, int toRow, int toCo
 }
 
 void GameManager::executeCastlingRules(ChessPiece *king, int toRow, int toCol) {
+  int fromRow = board->getRow(reversePieceMap[king]);
+  int fromCol = board->getColumn(reversePieceMap[king]);
+  int fromIndex = board->getIndex(fromRow, fromCol);
+  int toIndex = board->getIndex(toRow, toCol);
+  TeamColors color = king->getColor();
+
+  // series of error checks
+  // castling is defined as the king moving two squares in the same
+  if (toRow != fromRow || abs(toCol - fromCol) != 2) 
+    throw InvalidMoveException("ERROR: Invalid king move. Casling does not apply");
+  // king cannot castle if the king or its corresponding rook has moved
+  if ((color == TeamColors::WHITE && toCol > fromCol && (!whiteKingSideCastling || !whiteKingSideRook)) ||
+      (color == TeamColors::BLACK && toCol > fromCol && (!blackKingSideCastling || !blackKingSideCastling)))
+    throw InvalidMoveException("ERROR: King can not castle king side!");
+  if ((color == TeamColors::WHITE && toCol < fromCol && (!whiteQueenSideCastling || !whiteQueenSideRook)) || 
+      (color == TeamColors::BLACK && toCol < fromCol && (!blackQueenSideCastling || !blackQueenSideRook)))
+    throw InvalidMoveException("ERROR: King can not castle queen side!");
+  // king canot castle if in check or if the castling move would put king into check
+  if (inCheck(color))
+    throw InvalidMoveException("ERROR: King is in check and cannot castle");
+  if ((color == TeamColors::WHITE && blackControlledSpaces[toIndex].size() > 0) || 
+      (color == TeamColors::BLACK && whiteControlledSpaces[toIndex].size() > 0))
+    throw InvalidMoveException("ERROR: King is castling into check");
+
+  ChessPiece* castledRook;
+  if (color == TeamColors::BLACK)
+    castledRook = (toCol > fromCol) ? blackKingSideRook : blackQueenSideRook;
+  else
+    castledRook = (toCol > fromCol) ? whiteKingSideRook : whiteQueenSideRook;
+  int rookIndex = reversePieceMap[castledRook];
+
+  // ensure king has direct line of sight with rook
+  int searchStartIndex = (rookIndex < fromIndex) ? rookIndex : fromIndex;
+  int searchStopIndex = (rookIndex < fromIndex) ? fromIndex : rookIndex;
+  for (int i = searchStartIndex + 1; i <searchStopIndex; i++)
+    if (pieceMap[i])
+      throw InvalidMoveException("ERROR: " + pieceMap[i]->getName() + " blocks castling opportunity!");
   
+  // move the pieces
+  int castledRookColumn = (fromCol + toCol) / 2;
+  int castledRookIndex = board->getIndex(fromRow, castledRookColumn);
+  board->setPiece(fromRow, castledRookColumn, castledRook);
+  board->setPiece(toRow, toCol, king);
+
+  // update castling game state variables
+  disableKingCastling(color);
+
+  // update data structures
+  pieceMap[castledRookIndex] = castledRook;
+  pieceMap[toIndex] = king;
+  reversePieceMap[castledRook] = castledRookIndex;
+  reversePieceMap[king] = toIndex;
+  for (int i = 0; i < board->getColumns(); i++) {
+    ChessPiece *piece = board->getPiece(board->getIndex(fromRow, i));
+    if (piece)
+      updateControlSquares(piece);
+  }
 }
 
 void GameManager::updateMemberVariables(ChessPiece *figure, int toRow, int toCol) {

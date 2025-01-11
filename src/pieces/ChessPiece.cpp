@@ -16,6 +16,14 @@ bool ChessPiece::isSameTeam(ChessPiece *piece) {
   return (piece == nullptr ? false : color == piece->color); 
 }
 
+std::string ChessPiece::getName() const {
+  return this->name;
+}
+
+bool ChessPiece::getPromotionStatus() const {
+  return this->isPromotable;
+}
+
 std::string ChessPiece::getSymbol() const { 
   return this->symbol; 
 };

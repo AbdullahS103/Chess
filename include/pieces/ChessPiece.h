@@ -41,6 +41,10 @@ public:
 
   // Provided methods are supplemental methods that derived classes inherit
 
+  std::string getName() const;
+
+  bool getPromotionStatus() const;
+  
   std::string getSymbol() const;
 
   TeamColors getColor() const;
