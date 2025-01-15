@@ -19,9 +19,11 @@ protected:
 
   bool isPromotable;
 
+  char fen;
+
 public:
 
-  ChessPiece(TeamColors color, std::string symbol, std::string name, bool isPromotable);
+  ChessPiece(TeamColors color, std::string symbol, std::string name, bool isPromotable, char fen);
 
   virtual ~ChessPiece() = default;
 
@@ -48,6 +50,8 @@ public:
   std::string getSymbol() const;
 
   TeamColors getColor() const;
+
+  char getFENCharacter() const;
 
   bool isSameTeam(TeamColors color);
 

@@ -1,6 +1,6 @@
 #include "Queen.h"
 
-Queen::Queen(TeamColors color) : ChessPiece(color, (color == TeamColors::WHITE ? "♕" : "♛"), "Queen", true){};
+Queen::Queen(TeamColors color) : ChessPiece(color, (color == TeamColors::WHITE ? "♕" : "♛"), "Queen", true, (color == TeamColors::WHITE ? 'Q' : 'q')){};
 
 bool Queen::isValidMove(Board &board, int fromRow, int fromCol, int toRow, int toCol) { 
   if (!board.isOnBoard(fromRow, fromCol) || !board.isOnBoard(toRow, toCol))
@@ -95,3 +95,11 @@ bool Queen::operator==(const ChessPiece &piece) const {
   const Queen *queen = static_cast<const Queen*>(&piece);
   return queen->color == color && queen->symbol == symbol;
 };
+
+char Queen::getWhiteFENCharacter() {
+  return 'Q';
+}
+
+char Queen::getBlackFENCharacter() {
+  return 'q';
+}

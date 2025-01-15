@@ -106,6 +106,8 @@ public:
 
   bool inCheckmate(TeamColors team);
 
+  std::string getFENString() const;
+
   friend std::ostream &operator<<(std::ostream &strm, const GameManager &game);
 };
 

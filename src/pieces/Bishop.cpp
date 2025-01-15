@@ -1,6 +1,6 @@
 #include "Bishop.h"
 
-Bishop::Bishop(TeamColors color) : ChessPiece(color, (color == TeamColors::WHITE ? "♗" : "♝"), "Bishop", true){};
+Bishop::Bishop(TeamColors color) : ChessPiece(color, (color == TeamColors::WHITE ? "♗" : "♝"), "Bishop", true, (color == TeamColors::WHITE ? 'B' : 'b')){};
 
 bool Bishop::isValidMove(Board &board, int fromRow, int fromCol, int toRow, int toCol) { 
   if (!board.isOnBoard(fromRow, fromCol) || !board.isOnBoard(toRow, toCol))

@@ -15,6 +15,10 @@ public:
   std::unordered_set<int> getAllControlSquares(Board &board, int row, int col);
   
   bool operator==(const ChessPiece &piece) const;
+
+  static char getWhiteFENCharacter();
+
+  static char getBlackFENCharacter();
 };
 
 #endif

@@ -3,6 +3,7 @@
 #include "Errors.h"
 
 #include "King.h"
+#include "Queen.h"
 #include "Pawn.h"
 #include "Rook.h"
 #include "PieceGenerator.h"
@@ -28,6 +29,50 @@ GameManager::GameManager(FENManager fen) {
   // Initialize the board based on FEN
   BoardStateGenerator::FENBoard(*this->board, fen.getLayout());
   intializeMemberVariables();
+
+  // initialize castling variables
+  whiteQueenSideCastling = false;
+  whiteKingSideCastling = false;
+  blackQueenSideCastling = false;
+  blackKingSideCastling = false;
+  blackQueenSideRook = nullptr;
+  blackKingSideRook = nullptr;
+  whiteQueenSideRook = nullptr;
+  whiteKingSideRook = nullptr;
+  std::string castling = fen.getCastlingRights();
+  if (castling.find(King::getWhiteFENCharacter()) != std::string::npos) {
+    whiteKingSideCastling = true;
+    whiteKingSideRook = board->getPiece(board->getBoardSize() - 1);
+  }
+  if (castling.find(King::getBlackFENCharacter()) != std::string::npos) {
+    blackKingSideCastling = true;
+    blackKingSideRook = board->getPiece(board->getColumns() - 1);
+  }
+  if (castling.find(Queen::getWhiteFENCharacter()) != std::string::npos) {
+    whiteQueenSideCastling = true;
+    whiteQueenSideRook = board->getPiece((board->getRows() - 1) * board->getColumns());
+  }
+  if (castling.find(Queen::getBlackFENCharacter()) != std::string::npos) {
+    blackQueenSideCastling = true;
+    blackQueenSideRook = board->getPiece(0);
+  }
+
+  // initialize enpassant variable
+  std::string enpassant = fen.getEnpassantRights();
+  // roundabout logic to map a FEN enpassant string (eg. e5, b2, etc.) to an index
+  int index = (board->getRows() - std::tolower(enpassant.at(0)) + 'a' - 1) * board->getColumns() + (enpassant.at(1) - '0');
+  ChessPiece *target1 = nullptr;
+  ChessPiece *target2 = nullptr;
+  if (index >= board->getColumns())
+    target1 = board->getPiece(index - board->getColumns());
+  if (index < board->getBoardSize() - board->getColumns());
+    target2 = board->getPiece(index + board->getColumns());
+  target1 = (target1 && typeid(*target1) == typeid(Pawn)) ? target1 : nullptr;
+  target2 = (target2 && typeid(*target2) == typeid(Pawn)) ? target2 : nullptr;
+  if (target1 && !target2)
+    enpassantPiece = target1;
+  if (target2 && !target1)
+    enpassantPiece = target2;
 }
 
 GameManager::~GameManager() {
@@ -52,6 +97,7 @@ void GameManager::intializeMemberVariables() {
   this->whiteKingIndex = getKingIndex(TeamColors::WHITE);
   this->blackKingIndex = getKingIndex(TeamColors::BLACK);
   promotionTargets = {"Rook", "Knight", "Bishop", "Queen"};
+  enpassantPiece = nullptr;
 
   for (int i = 0; i < board->getBoardSize(); i++) 
     pieceMap[i] = nullptr;
@@ -596,6 +642,10 @@ void GameManager::updateControlSquares(ChessPiece *piece) {
     if (oldSquares.find(index) == oldSquares.end())
       controlledSpaces[index].insert(piece);
 } 
+
+std::string GameManager::getFENString() const {
+  return FENManager::getFENString(*board);
+}
 
 void GameManager::printJumpers() const {
   std::ostringstream oss; // String stream to build the string

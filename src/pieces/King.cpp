@@ -1,6 +1,6 @@
 #include "King.h"
 
-King::King(TeamColors color) : ChessPiece(color, (color == TeamColors::WHITE ? "♔" : "♚"), "King", false){};
+King::King(TeamColors color) : ChessPiece(color, (color == TeamColors::WHITE ? "♔" : "♚"), "King", false, (color == TeamColors::WHITE ? 'K' : 'k')){};
 
 bool King::isValidMove(Board &board, int fromRow, int fromCol, int toRow, int toCol) { 
   if (!board.isOnBoard(fromRow, fromCol) || !board.isOnBoard(toRow, toCol))
@@ -53,3 +53,11 @@ bool King::operator==(const ChessPiece &piece) const {
   const King *king = static_cast<const King*>(&piece);
   return king->color == color && king->symbol == symbol;
 };
+
+char King::getWhiteFENCharacter() {
+  return 'K';
+}
+
+char King::getBlackFENCharacter() {
+  return 'k';
+}

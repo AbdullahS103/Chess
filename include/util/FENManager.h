@@ -2,6 +2,7 @@
 #define FEN_MANAGER_H
 
 #include "CommonHeaders.h"
+#include "Board.h"
 
 // Class used to validate FEN and deconstruct FEN string
 class FENManager {
@@ -51,6 +52,8 @@ public:
   int getHalfMoves();
 
   int getFullMoves();
+
+  static std::string getFENString(Board &board);
 };
 
 #endif

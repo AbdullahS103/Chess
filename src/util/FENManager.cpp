@@ -200,3 +200,36 @@ int FENManager::getHalfMoves() {
 int FENManager::getFullMoves() {
   return fullmoves;
 };
+
+std::string FENManager::getFENString(Board &board) {
+  int rows = board.getRows();
+  int columns = board.getColumns();
+  std::string fen = "";
+
+  for (int i = 0; i < rows; i++) {
+    int emptySquares = 0;
+
+    for (int j = 0; j < columns; j++) {
+      ChessPiece *piece = board.getPiece(i, j);
+      if (!piece) {
+        emptySquares++;
+        continue;
+      }
+
+      if (emptySquares != 0)
+        fen += std::to_string(emptySquares);
+      emptySquares = 0;
+      fen += piece->getFENCharacter();
+    }
+
+    if (emptySquares != 0)
+        fen += std::to_string(emptySquares);
+
+    if (i < rows - 1)
+      fen += "/";
+  }
+
+  return fen;
+}
+
+

@@ -1,11 +1,12 @@
 #include "ChessPiece.h"
 #include "Errors.h"
 
-ChessPiece::ChessPiece(TeamColors color, std::string symbol, std::string name, bool isPromotable) { 
+ChessPiece::ChessPiece(TeamColors color, std::string symbol, std::string name, bool isPromotable, char fen) { 
   this->color = color; 
   this->symbol = symbol;
   this->name = name;
   this->isPromotable = isPromotable;
+  this->fen = fen;
 }
 
 std::ostream &operator<<(std::ostream &strm, const ChessPiece &piece) { 
@@ -30,6 +31,10 @@ std::string ChessPiece::getSymbol() const {
 
 TeamColors ChessPiece::getColor() const {
   return this->color;
+}
+
+char ChessPiece::getFENCharacter() const {
+  return this->fen;
 }
 
 bool ChessPiece::isSameTeam(TeamColors color) { 

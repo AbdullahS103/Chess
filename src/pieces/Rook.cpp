@@ -1,6 +1,6 @@
 #include "Rook.h"
 
-Rook::Rook(TeamColors color) : ChessPiece(color, (color == TeamColors::WHITE ? "♖" : "♜"), "Rook", true){};
+Rook::Rook(TeamColors color) : ChessPiece(color, (color == TeamColors::WHITE ? "♖" : "♜"), "Rook", true, (color == TeamColors::WHITE ? 'R' : 'r')){};
 
 bool Rook::isValidMove(Board &board, int fromRow, int fromCol, int toRow, int toCol) { 
   if (!board.isOnBoard(fromRow, fromCol) || !board.isOnBoard(toRow, toCol))
@@ -94,3 +94,11 @@ bool Rook::operator==(const ChessPiece &piece) const {
   const Rook *rook = static_cast<const Rook*>(&piece);
   return rook->color == color && rook->symbol == symbol;
 };
+
+char Rook::getWhiteFENCharacter() {
+  return 'R';
+}
+
+char Rook::getBlackFENCharacter() {
+  return 'r';
+}
