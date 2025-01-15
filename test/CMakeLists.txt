@@ -43,3 +43,9 @@ file(GLOB PAWN_TEST_SOURCE "pieces/PawnTest.cpp")
 add_executable(PawnTests ${PAWN_TEST_SOURCE})
 target_link_libraries(PawnTests gtest gtest_main chess_lib)
 add_test(NAME PawnTests COMMAND PawnTests)
+
+# King Unit Tests
+file(GLOB GAME_MANAGER_TEST_SOURCE "game/GameManagerTest.cpp")
+add_executable(GameManagerTests ${GAME_MANAGER_TEST_SOURCE})
+target_link_libraries(GameManagerTests gtest gtest_main chess_lib)
+add_test(NAME GameManagerTests COMMAND GameManagerTests)
