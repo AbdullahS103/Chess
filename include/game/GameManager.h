@@ -94,7 +94,7 @@ class GameManager {
 public:
   GameManager();
 
-  GameManager(FENManager fen);
+  GameManager(std::string fen);
 
   ~GameManager();
 

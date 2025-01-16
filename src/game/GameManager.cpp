@@ -23,11 +23,12 @@ GameManager::GameManager() {
   whiteKingSideRook = board->getPiece(63);
 }
 
-GameManager::GameManager(FENManager fen) {
+GameManager::GameManager(std::string fen) {
+  FENManager fenManager = FENManager(fen);
   this->board = new Board();
 
   // Initialize the board based on FEN
-  BoardStateGenerator::FENBoard(*this->board, fen.getLayout());
+  BoardStateGenerator::FENBoard(*this->board, fenManager.getLayout());
   intializeMemberVariables();
 
   // initialize castling variables
@@ -39,7 +40,7 @@ GameManager::GameManager(FENManager fen) {
   blackKingSideRook = nullptr;
   whiteQueenSideRook = nullptr;
   whiteKingSideRook = nullptr;
-  std::string castling = fen.getCastlingRights();
+  std::string castling = fenManager.getCastlingRights();
   if (castling.find(King::getWhiteFENCharacter()) != std::string::npos) {
     whiteKingSideCastling = true;
     whiteKingSideRook = board->getPiece(board->getBoardSize() - 1);
@@ -58,14 +59,16 @@ GameManager::GameManager(FENManager fen) {
   }
 
   // initialize enpassant variable
-  std::string enpassant = fen.getEnpassantRights();
+  std::string enpassant = fenManager.getEnpassantRights();
+  if (enpassant == "-")
+    return;
   // roundabout logic to map a FEN enpassant string (eg. e5, b2, etc.) to an index
   int index = (board->getRows() - std::tolower(enpassant.at(0)) + 'a' - 1) * board->getColumns() + (enpassant.at(1) - '0');
   ChessPiece *target1 = nullptr;
   ChessPiece *target2 = nullptr;
   if (index >= board->getColumns())
     target1 = board->getPiece(index - board->getColumns());
-  if (index < board->getBoardSize() - board->getColumns());
+  if (index < board->getBoardSize() - board->getColumns())
     target2 = board->getPiece(index + board->getColumns());
   target1 = (target1 && typeid(*target1) == typeid(Pawn)) ? target1 : nullptr;
   target2 = (target2 && typeid(*target2) == typeid(Pawn)) ? target2 : nullptr;
@@ -275,21 +278,26 @@ void GameManager::movePiece(int fromRow, int fromCol, int toRow, int toCol) {
   std::map<int, std::unordered_set<ChessPiece*>> enemyControlMap = (team == TeamColors::WHITE) ? blackControlledSpaces : whiteControlledSpaces;
 
   int fromPieceIndex = board->getIndex(fromRow, fromCol);
+  int toPieceIndex = board->getIndex(toRow, toCol);
   int kingIndex = (team == TeamColors::WHITE ? whiteKingIndex : blackKingIndex);
   int kingRow = board->getRow(kingIndex);
   int kingCol = board->getColumn(kingIndex);
   
-  bool isPinned = isPiecePinnedToKing(kingIndex, fromPieceIndex);
+  bool isPinned = (kingIndex == fromPieceIndex) ? false : isPiecePinnedToKing(kingIndex, fromPieceIndex);
   bool isCheck = inCheck(team);
+  bool movingKing = (kingIndex == fromPieceIndex);
+  
   if (isPinned && isCheck)
     throw InvalidMoveException("ERROR: Piece is pinned and cannot be moved until check resolves.");
-  
+  if (movingKing && enemyControlMap[toPieceIndex].size() > 0)
+    throw InvalidMoveException("ERROR: King is moving into danger");
+
   // temporarily make the move
   board->setPiece(toRow, toCol, fromPiece);
   board->setPiece(fromRow, fromCol, nullptr);
 
   // Ensure king is safe after move
-  if (isCheck || isPinned) {
+  if (!movingKing && (isCheck || isPinned)) {
     int index = isCheck ? kingIndex : fromPieceIndex;
     for (ChessPiece* attacker : enemyControlMap[index]) {
       // Skip pieces that would be captured with this move
@@ -298,6 +306,7 @@ void GameManager::movePiece(int fromRow, int fromCol, int toRow, int toCol) {
       int attackerRow = board->getRow(reversePieceMap[attacker]);
       int attackerCol = board->getColumn(reversePieceMap[attacker]);
       if (attacker->isValidMove(*board, attackerRow, attackerCol, kingRow, kingCol)) {
+        std::cout << attacker->getName() << std::endl;
         board->setPiece(toRow, toCol, toPiece);
         board->setPiece(fromRow, fromCol, fromPiece);
         throw InvalidMoveException("ERROR: Move allows opponent to capture king on next turn.");

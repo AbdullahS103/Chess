@@ -8,5 +8,7 @@ TEST(GameManagerTests, FENStringTest1) {
 }
 
 TEST(GameManagerTests, FENStringTest2) {
-  GameManager testBoard = GameManager('')
+  GameManager testBoard = GameManager("k7/5q2/8/8/8/8/8/RNBQKBNR w KQkq - 0 0");
+  testBoard.movePiece(0, 0, 0, 1);
+  EXPECT_EQ(testBoard.getFENString(), "1k6/5q2/8/8/8/8/8/RNBQKBNR");
 }
